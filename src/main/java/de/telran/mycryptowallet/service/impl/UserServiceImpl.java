@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> getUserById(Long id) {
+    public User getUserById(Long id) {
         return userRepository.findUserById(id);
     }
 
@@ -41,13 +41,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User updatedUser) {
-        return userRepository.save(updatedUser);
+    public void updateUser(Long id, User updatedUser) {
+        updatedUser.setId(id);
+        userRepository.save(updatedUser);
     }
 
     @Override
     public List<User> getUsersByStatus(UserStatus status) {
-        return userRepository.findUsersByUserStatus(status);
+        return userRepository.findUsersByStatus(status);
     }
 
     @Override

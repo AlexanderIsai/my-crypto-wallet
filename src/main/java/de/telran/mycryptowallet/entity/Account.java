@@ -42,7 +42,7 @@ public class Account {
     @Column(name = "balance")
     private BigDecimal balance;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "account")
     private Set<Order> orders = new HashSet<>();
 
 

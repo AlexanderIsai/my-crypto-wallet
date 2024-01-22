@@ -1,9 +1,16 @@
 package de.telran.mycryptowallet;
+import de.telran.mycryptowallet.entity.User;
+import de.telran.mycryptowallet.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -13,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class WebSecurityConfiguration {
 
     @Bean
@@ -21,12 +29,33 @@ public class WebSecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(request -> {
-                    request.requestMatchers(HttpMethod.GET, "/show-all-users").hasRole("ADMIN");
+                    request.requestMatchers(HttpMethod.GET, "/users/show-all-users").hasRole("ADMIN");
                     request.anyRequest().permitAll();
                 })
                 .formLogin(formLogin -> formLogin.disable())
                 .httpBasic(httpBasis -> httpBasis.init(http));
         return http.build();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService(UserRepository userRepository){
+        UserDetailsService userDetailsService = (username) -> {
+            User user = userRepository.findUserByUserName(username);
+            if (user != null) {
+                return user;
+            }
+            else {
+                throw new UsernameNotFoundException("ERROR");
+            }
+        };
+
+        return userDetailsService;
+
+    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+
+        return NoOpPasswordEncoder.getInstance();
     }
 }
 //TODO повторить и разобраться в деталях авторизации

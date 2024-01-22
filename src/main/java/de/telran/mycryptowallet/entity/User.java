@@ -1,4 +1,5 @@
 package de.telran.mycryptowallet.entity;
+
 import de.telran.mycryptowallet.entity.entityEnum.UserRole;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
 import jakarta.persistence.*;
@@ -8,16 +9,18 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Entity User
+ *
  * @author Alexander Isai on 16.01.2024.
  * description. The basic essence of the application. Protected by SpringSecurity.
  * It has fields - username, e-mail, password, role, status, account list
- * */
+ */
 @Entity
 @Table(name = "crypto_users")
 @NoArgsConstructor
@@ -42,21 +45,21 @@ public class User implements UserDetails {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private UserStatus userStatus;
+    private UserStatus status;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Account> accounts = new HashSet<>();
+//    @OneToMany(mappedBy = "user")
+//    private Set<Account> accounts = new HashSet<>();
     //TODO определиться - нужно ли юзеру это поле
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    private UserRole userRole;
+    private UserRole role;
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority(userRole.name()));
+        authorities.add(new SimpleGrantedAuthority(this.getRole().name()));
         return authorities;
     }
 

@@ -26,7 +26,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     Optional<Account> findAccountByIdAndUserId(Long accountId, Long userId);
 
-    Optional<Account> findAccountByPublicAddress(String address);
+    Account findAccountByPublicAddress(String address);
 
     List<Account> findAccountsByBalanceGreaterThan(BigDecimal amount);
 
@@ -39,4 +39,5 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query(nativeQuery = true, value = "SELECT * FROM crypto_accounts WHERE balance BETWEEN :from AND :to")
     List<Account> getAccountsBetween(@Param(value = "from") BigDecimal from, @Param(value = "to") BigDecimal to);
 
+    Optional<Account> findAccountByUserIdAndCurrencyCode(Long userId, String code);
 }

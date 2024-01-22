@@ -15,13 +15,13 @@ public interface UserService {
 
     void addNewUser(User user);
 
-    Optional<User> getUserById(Long id);
+    User getUserById(Long id);
 
     Optional<User> getUserByEmail(String email);
 
     List<User> getAllUsers();
 
-    User updateUser(User user);
+    void updateUser(Long id, User user);
 
     List<User> getUsersByStatus(UserStatus status);
 
