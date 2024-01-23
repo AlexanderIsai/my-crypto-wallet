@@ -41,9 +41,4 @@ public class Account {
 
     @Column(name = "balance")
     private BigDecimal balance;
-
-    @OneToMany(mappedBy = "account")
-    private Set<Order> orders = new HashSet<>();
-
-
 }

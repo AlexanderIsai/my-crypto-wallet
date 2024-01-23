@@ -1,8 +1,13 @@
 package de.telran.mycryptowallet.service.impl;
 
+import de.telran.mycryptowallet.dto.AccountAddDTO;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.repository.AccountRepository;
-import de.telran.mycryptowallet.service.AccountService;
+import de.telran.mycryptowallet.repository.CurrencyRepository;
+import de.telran.mycryptowallet.service.interfaces.AccountService;
+import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
+import de.telran.mycryptowallet.service.interfaces.CurrencyService;
+import de.telran.mycryptowallet.service.utils.PublicAddressGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +25,15 @@ import java.util.Optional;
 public class AccountServiceImpl implements AccountService {
 
     public final AccountRepository accountRepository;
+    public final CurrencyService currencyService;
+    public final ActiveUserService activeUserService;
     @Override
-    public void addNewAccount(Account account) {
+    public void addNewAccount(AccountAddDTO accountAddDTO) {
+        Account account = new Account();
+        account.setUser(activeUserService.getActiveUser());
+        account.setPublicAddress(PublicAddressGenerator.generatePublicAddress(accountAddDTO.getCurrencyCode()));
+        account.setCurrency(currencyService.getCurrencyByCode(accountAddDTO.getCurrencyCode()));
+        account.setBalance(BigDecimal.ZERO);
         accountRepository.save(account);
     }
 

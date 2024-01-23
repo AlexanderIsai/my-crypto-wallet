@@ -28,7 +28,4 @@ public class Currency {
     @Column(name = "title")
     private String title;
 
-    @OneToMany(mappedBy = "currency")
-    Set<Account> accounts = new HashSet<>();
-
 }

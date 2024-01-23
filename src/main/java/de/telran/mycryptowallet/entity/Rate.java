@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 /**
  * Entity Rate
@@ -32,4 +34,8 @@ public class Rate {
     @ManyToOne
     @JoinColumn(name = "currency", referencedColumnName = "code")
     private Currency currency;
+
+    @CreationTimestamp
+    @Column(name =  "created_at")
+    private Instant createdOn;
 }

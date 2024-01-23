@@ -1,4 +1,4 @@
-package de.telran.mycryptowallet.service;
+package de.telran.mycryptowallet.service.interfaces;
 
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;

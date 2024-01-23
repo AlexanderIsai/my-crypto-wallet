@@ -2,11 +2,11 @@ package de.telran.mycryptowallet.controller;
 
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
-import de.telran.mycryptowallet.service.UserService;
+import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
+import de.telran.mycryptowallet.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +22,7 @@ import java.util.List;
 @Slf4j
 public class UserController {
     private final UserService userService;
+    private final ActiveUserService activeUserService;
 
     @PostMapping(value = "/add-new-user")
     public void save(@RequestBody User user) {
@@ -33,7 +34,7 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/user-id/{id}")
     public ResponseEntity<User> showUserById(@PathVariable(value = "id") Long id) {
         User user = userService.getUserById(id);
         if (user != null) {
@@ -45,8 +46,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/active-user")
-    public ResponseEntity<User> showActiveUser() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public ResponseEntity<User> getActiveUser(){
+        User user = activeUserService.getActiveUser();
         if (user != null) {
             return ResponseEntity.ok(user);
         } else {
@@ -55,10 +56,11 @@ public class UserController {
         }
     }
 
-    @GetMapping(value = "/{email}")
+    @GetMapping(value = "/emails/{email}")
     public ResponseEntity<User> showUserByEmail(@PathVariable(value = "email") String email) {
         return ResponseEntity.ok(userService.getUserByEmail(email).orElseThrow());
     }
+    //TODO исправить
 
     @PutMapping(value = "/{id}")
     public void updateUser(@PathVariable(value = "id") Long id, @RequestBody User user) {

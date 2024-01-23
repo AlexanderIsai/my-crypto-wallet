@@ -1,5 +1,6 @@
-package de.telran.mycryptowallet.service;
+package de.telran.mycryptowallet.service.interfaces;
 
+import de.telran.mycryptowallet.dto.AccountAddDTO;
 import de.telran.mycryptowallet.entity.Account;
 
 import java.math.BigDecimal;
@@ -13,7 +14,7 @@ import java.util.Optional;
  */
 public interface AccountService {
 
-    void addNewAccount(Account account);
+    void addNewAccount(AccountAddDTO accountAddDTO);
 
     List<Account> getAllAccounts();
 
@@ -38,4 +39,5 @@ public interface AccountService {
     List<Account> getAccountsBetweenAmount(BigDecimal from, BigDecimal to);
 
     Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code);
+
 }

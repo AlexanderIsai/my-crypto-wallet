@@ -1,7 +1,8 @@
 package de.telran.mycryptowallet.controller;
 
+import de.telran.mycryptowallet.dto.AccountAddDTO;
 import de.telran.mycryptowallet.entity.Account;
-import de.telran.mycryptowallet.service.AccountService;
+import de.telran.mycryptowallet.service.interfaces.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +24,10 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @PutMapping(value = "/add")
-    public void addNewAccount(Account account) {
-        accountService.addNewAccount(account);
+
+    @PostMapping(value = "/add")
+    public void addNewAccount(@RequestBody AccountAddDTO accountAddDTO) {
+        accountService.addNewAccount(accountAddDTO);
     }
 
     @GetMapping(value = "/all")
