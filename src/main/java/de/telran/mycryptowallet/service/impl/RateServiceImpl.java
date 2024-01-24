@@ -25,9 +25,12 @@ public class RateServiceImpl implements RateService {
 
     private final CurrencyService currencyService;
     private final RateRepository rateRepository;
+    private final RateGenerator rateGenerator;
+    private final String BASIC_CURRENCY = "USDT";
+    private final BigDecimal BASIC_RATE = BigDecimal.valueOf(1.00);
     @Override
     public Map<String, Object> getRate() {
-        return RateGenerator.getBitcoinPrice();
+        return rateGenerator.getBitcoinPrice();
     }
 
     @Override
@@ -43,6 +46,14 @@ public class RateServiceImpl implements RateService {
 
     @Override
     public Rate getFreshRate(String code) {
-        return rateRepository.getFreshRate(code);
+        Rate rate = new Rate();
+        if (code.equals(BASIC_CURRENCY)){
+            rate.setCurrency(currencyService.getCurrencyByCode(BASIC_CURRENCY));
+            rate.setValue(BASIC_RATE);
+        }
+        else {
+            rate = rateRepository.getFreshRate(code);
+        }
+        return rate;
     }
 }

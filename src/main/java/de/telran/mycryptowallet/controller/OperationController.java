@@ -1,7 +1,6 @@
 package de.telran.mycryptowallet.controller;
 
 import de.telran.mycryptowallet.dto.OperationAddDTO;
-import de.telran.mycryptowallet.entity.Operation;
 import de.telran.mycryptowallet.service.interfaces.OperationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(name = "/operations")
+@RequestMapping(value = "/operations")
 @Slf4j
 public class OperationController {
 
@@ -25,8 +24,8 @@ public class OperationController {
 
     @PostMapping(value = "/add")
     public void addOperation(@RequestBody OperationAddDTO operationAddDTO) {
-        operationService.addOperation(operationAddDTO);
 
+        operationService.addOperation(operationAddDTO);
     }
 
 }

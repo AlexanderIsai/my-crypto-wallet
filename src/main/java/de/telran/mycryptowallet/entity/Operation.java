@@ -40,9 +40,8 @@ public class Operation {
     @Column(name = "amount")
     private BigDecimal amount;
 
-    @ManyToOne
-    @JoinColumn(name = "rate")
-    private Rate rate;
+    @Column(name = "rate")
+    private BigDecimal rateValue;
 
     @Column(name = "operation_type")
     @Enumerated(EnumType.STRING)

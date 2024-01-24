@@ -1,6 +1,9 @@
 package de.telran.mycryptowallet.service.utils;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
@@ -10,12 +13,17 @@ import java.util.Map;
  *
  * @author Alexander Isai on 23.01.2024.
  */
+@Service
+@RequiredArgsConstructor
 public class RateGenerator {
 
+    @Value("${url.bitcoin}")
+    private  String bitcoinUrl;
+
     @Scheduled(cron = "0 */5 * * * *")
-    public static Map<String, Object> getBitcoinPrice() {
+    public Map<String, Object> getBitcoinPrice() {
         RestTemplate restTemplate = new RestTemplate();
-        String url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd";
+        String url = bitcoinUrl;
         return restTemplate.getForObject(url, Map.class);
     }
 

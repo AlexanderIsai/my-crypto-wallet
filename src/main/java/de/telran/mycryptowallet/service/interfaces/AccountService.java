@@ -24,6 +24,8 @@ public interface AccountService {
 
     Account getAccountByPublicAddress(String address);
 
+    Account getAccountById(Long id);
+
     List<Account> getAccountsByBalanceGreaterThan(BigDecimal amount);
 
     List<Account> getAccountsByBalanceLessThan(BigDecimal amount);
@@ -37,6 +39,9 @@ public interface AccountService {
     List<Account> getAccountsBetweenAmount(BigDecimal from, BigDecimal to);
 
     Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code);
+
+    void deposit(Long id, BigDecimal amount);
+    void withdraw(Long id, BigDecimal amount);
 
 
 

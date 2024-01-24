@@ -58,6 +58,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Account getAccountById(Long id) {
+        return accountRepository.findAccountById(id);
+    }
+
+    @Override
     public List<Account> getAccountsByBalanceGreaterThan(BigDecimal amount) {
         return accountRepository.findAccountsByBalanceGreaterThan(amount);
     }
@@ -91,5 +96,19 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code) {
         return accountRepository.findAccountByUserIdAndCurrencyCode(userId, code);
+    }
+
+    @Override
+    public void deposit(Long id, BigDecimal amount) {
+        Account account = accountRepository.findAccountById(id);
+        account.setBalance(account.getBalance().add(amount));
+        updateAccount(id, account);
+    }
+
+    @Override
+    public void withdraw(Long id, BigDecimal amount) {
+        Account account = accountRepository.findAccountById(id);
+        account.setBalance(account.getBalance().subtract(amount));
+        updateAccount(id, account);
     }
 }
