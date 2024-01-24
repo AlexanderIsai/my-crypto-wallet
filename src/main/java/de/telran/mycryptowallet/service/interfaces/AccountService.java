@@ -22,8 +22,6 @@ public interface AccountService {
 
     List<Account> getAccountsByCurrency(String code);
 
-    Optional<Account> getAccountByIDAndUserId(Long accountID, Long userId);
-
     Account getAccountByPublicAddress(String address);
 
     List<Account> getAccountsByBalanceGreaterThan(BigDecimal amount);
@@ -32,12 +30,14 @@ public interface AccountService {
 
     Boolean existsAccountById(Long id);
 
-    Boolean existsAccountByUserId(Long userId);
+    Boolean existsAccountByUserIdAndCurrency(Long userId, String code);
 
     void updateAccount(Long id, Account account);
 
     List<Account> getAccountsBetweenAmount(BigDecimal from, BigDecimal to);
 
     Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code);
+
+
 
 }

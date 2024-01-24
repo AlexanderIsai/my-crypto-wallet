@@ -10,5 +10,5 @@ import lombok.Data;
 @Data
 public class AccountAddDTO {
 
-    String currencyCode;
+    private String currencyCode;
 }

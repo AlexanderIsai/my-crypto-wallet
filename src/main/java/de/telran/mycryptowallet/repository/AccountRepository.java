@@ -24,7 +24,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     List<Account> findAccountsByCurrencyCode(String code);
 
-    Optional<Account> findAccountByIdAndUserId(Long accountId, Long userId);
+    Account findAccountById(Long id);
 
     Account findAccountByPublicAddress(String address);
 
@@ -34,7 +34,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     Boolean existsAccountById(Long id);
 
-    Boolean existsAccountByUserId(Long userId);
+    Boolean existsAccountByUserIdAndCurrencyCode(Long userId, String code);
 
     @Query(nativeQuery = true, value = "SELECT * FROM crypto_accounts WHERE balance BETWEEN :from AND :to")
     List<Account> getAccountsBetween(@Param(value = "from") BigDecimal from, @Param(value = "to") BigDecimal to);

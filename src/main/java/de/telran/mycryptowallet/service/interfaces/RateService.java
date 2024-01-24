@@ -1,5 +1,7 @@
 package de.telran.mycryptowallet.service.interfaces;
 
+import de.telran.mycryptowallet.entity.Rate;
+
 import java.util.Map;
 
 /**
@@ -11,5 +13,7 @@ public interface RateService {
 
     Map<String, Object> getRate();
     void addRate();
+
+    Rate getFreshRate(String code);
 
 }

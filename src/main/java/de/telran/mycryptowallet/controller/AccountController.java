@@ -45,9 +45,9 @@ public class AccountController {
         return accountService.getAccountsByCurrency(code);
     }
 
-    @GetMapping(value = "/user-account")
-    public Account showAccountByIdAndUserId(@RequestParam(name = "accId") Long accId, @RequestParam(name = "userId") Long userId) {
-        return accountService.getAccountByIDAndUserId(accId, userId).orElseThrow();
+    @GetMapping(value = "/user-currency")
+    public Account showAccountByIdAndUserId(@RequestParam(name = "userId") Long userId, @RequestParam(name = "code") String code) {
+        return accountService.getAccountByUserIdAndCurrency(userId, code).orElseThrow();
     }
 
     @GetMapping(value = "/address")

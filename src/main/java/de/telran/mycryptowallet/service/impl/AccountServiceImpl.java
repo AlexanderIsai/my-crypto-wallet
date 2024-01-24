@@ -53,11 +53,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Optional<Account> getAccountByIDAndUserId(Long accountID, Long userId) {
-        return accountRepository.findAccountByIdAndUserId(accountID, userId);
-    }
-
-    @Override
     public Account getAccountByPublicAddress(String address) {
         return accountRepository.findAccountByPublicAddress(address);
     }
@@ -78,8 +73,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Boolean existsAccountByUserId(Long userId) {
-        return accountRepository.existsAccountByUserId(userId);
+    public Boolean existsAccountByUserIdAndCurrency(Long userId, String code) {
+        return accountRepository.existsAccountByUserIdAndCurrencyCode(userId, code);
     }
 
     @Override

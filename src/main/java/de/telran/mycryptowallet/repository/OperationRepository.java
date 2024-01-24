@@ -40,5 +40,4 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
     List<Operation> findOperationsByUserIdAndCurrencyCode(Long userId, String code);
 
 
-
 }

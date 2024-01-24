@@ -60,7 +60,6 @@ public class UserController {
     public ResponseEntity<User> showUserByEmail(@PathVariable(value = "email") String email) {
         return ResponseEntity.ok(userService.getUserByEmail(email).orElseThrow());
     }
-    //TODO исправить
 
     @PutMapping(value = "/{id}")
     public void updateUser(@PathVariable(value = "id") Long id, @RequestBody User user) {

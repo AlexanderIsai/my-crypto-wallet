@@ -40,4 +40,9 @@ public class RateServiceImpl implements RateService {
         rate.setValue(BigDecimal.valueOf((Integer) priceUsd.get(priceUsd.keySet().iterator().next())));
         rateRepository.save(rate);
     }
+
+    @Override
+    public Rate getFreshRate(String code) {
+        return rateRepository.getFreshRate(code);
+    }
 }
