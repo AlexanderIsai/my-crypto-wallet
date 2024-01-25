@@ -87,7 +87,7 @@ public class AccountServiceImpl implements AccountService {
         account.setId(id);
         accountRepository.save(account);
     }
-
+//TODO проверять, а есть ли аккаунт??
     @Override
     public List<Account> getAccountsBetweenAmount(BigDecimal from, BigDecimal to) {
         return accountRepository.getAccountsBetween(from, to);
@@ -111,4 +111,5 @@ public class AccountServiceImpl implements AccountService {
         account.setBalance(account.getBalance().subtract(amount));
         updateAccount(id, account);
     }
+    //TODO проверить, достаточно ли средств
 }

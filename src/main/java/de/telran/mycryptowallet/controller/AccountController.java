@@ -35,13 +35,13 @@ public class AccountController {
         return accountService.getAllAccounts();
     }
 
-    @GetMapping(value = "/{userId}")
-    public List<Account> showAccountsByUser(@PathVariable(name = "userId") Long userId) {
+    @GetMapping(value = "")
+    public List<Account> showAccountsByUser(@RequestParam(name = "userId") Long userId) {
         return accountService.getAccountsByUser(userId);
     }
 
-    @GetMapping(value = "/{code}")
-    public List<Account> showAccountsByCurrency(@PathVariable(name = "code") String code) {
+    @GetMapping(value = "")
+    public List<Account> showAccountsByCurrency(@RequestParam(name = "code") String code) {
         return accountService.getAccountsByCurrency(code);
     }
 

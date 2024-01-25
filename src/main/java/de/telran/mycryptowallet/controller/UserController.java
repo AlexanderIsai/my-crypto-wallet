@@ -56,8 +56,8 @@ public class UserController {
         }
     }
 
-    @GetMapping(value = "/emails/{email}")
-    public ResponseEntity<User> showUserByEmail(@PathVariable(value = "email") String email) {
+    @GetMapping(value = "")
+    public ResponseEntity<User> showUserByEmail(@RequestParam(value = "email") String email) {
         return ResponseEntity.ok(userService.getUserByEmail(email).orElseThrow());
     }
 
