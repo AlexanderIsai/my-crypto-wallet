@@ -2,7 +2,6 @@ package de.telran.mycryptowallet.service.impl;
 
 import de.telran.mycryptowallet.dto.OperationAddDTO;
 import de.telran.mycryptowallet.entity.*;
-import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.repository.OperationRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
 import jakarta.transaction.Transactional;
@@ -25,7 +24,7 @@ public class OperationServiceImpl implements OperationService {
     private final AccountService accountService;
     private  final CurrencyService currencyService;
     private final RateService rateService;
-    private final String BASIC_ACCOUNT = "USDT";
+    private final String BASIC_CURRENCY = "USDT";
     @Override
     @Transactional
     public void addOperation(OperationAddDTO operationAddDTO) {
@@ -47,43 +46,43 @@ public class OperationServiceImpl implements OperationService {
 
         operation.setType(operationAddDTO.getType());
 
-        cashFlow(operationAddDTO.getType(), operationUser.getId(), operationCurrency.getCode(), operationAddDTO.getAmount());
+        cashFlow(operation);
 
         operationRepository.save(operation);
     }
 
     @Override
-    public void cashFlow(OperationType type, Long userId, String code, BigDecimal amount) {
-        switch (type) {
+    public void cashFlow(Operation operation) {
+        switch (operation.getType()) {
             case DEPOSIT:
-                accountService.deposit(accountService.getAccountByUserIdAndCurrency(userId, code).orElseThrow().getId(), amount);
+                accountService.deposit(operation.getAccount().getId(), operation.getAmount());
                 break;
             case WITHDRAW:
-                accountService.withdraw(accountService.getAccountByUserIdAndCurrency(userId, code).orElseThrow().getId(), amount);
+                accountService.withdraw(operation.getAccount().getId(), operation.getAmount());
                 break;
             case BUY:
-                buy(userId, code, amount);
+                buy(operation);
                 break;
             case SELL:
-                sell(userId, code, amount);
+                sell(operation);
         }
 
 
     }
 
     @Override
-    public void buy(Long userId, String code, BigDecimal amount) {
-        Account accountSell = accountService.getAccountByUserIdAndCurrency(userId, BASIC_ACCOUNT).orElseThrow();
-        Account accountBuy = accountService.getAccountByUserIdAndCurrency(userId, code).orElseThrow();
-        accountService.withdraw(accountSell.getId(), amount);
-        accountService.deposit(accountBuy.getId(), amount);
+    public void buy(Operation operation) {
+        Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), BASIC_CURRENCY).orElseThrow();
+        Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
+        accountService.withdraw(accountSell.getId(), operation.getAmount().multiply(operation.getRateValue()));
+        accountService.deposit(accountBuy.getId(), operation.getAmount());
     }
 
     @Override
-    public void sell(Long userId, String code, BigDecimal amount) {
-        Account accountBuy = accountService.getAccountByUserIdAndCurrency(userId, BASIC_ACCOUNT).orElseThrow();
-        Account accountSell = accountService.getAccountByUserIdAndCurrency(userId, code).orElseThrow();
-        accountService.withdraw(accountSell.getId(), amount);
-        accountService.deposit(accountBuy.getId(), amount);
+    public void sell(Operation operation) {
+        Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), BASIC_CURRENCY).orElseThrow();
+        Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
+        accountService.withdraw(accountSell.getId(), operation.getAmount());
+        accountService.deposit(accountBuy.getId(), operation.getAmount().multiply(operation.getRateValue()));
     }
 }

@@ -24,8 +24,8 @@ public class OperationController {
 
     @PostMapping(value = "/add")
     public void addOperation(@RequestBody OperationAddDTO operationAddDTO) {
-
         operationService.addOperation(operationAddDTO);
+
     }
 
 }

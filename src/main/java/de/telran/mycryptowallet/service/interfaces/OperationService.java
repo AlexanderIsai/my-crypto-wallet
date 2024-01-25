@@ -14,9 +14,9 @@ import java.math.BigDecimal;
 public interface OperationService {
 
     void addOperation(OperationAddDTO operationAddDTO);
-    void cashFlow(OperationType type, Long userId, String code, BigDecimal amount);
-    void buy(Long userId, String code, BigDecimal amount);
-    void sell(Long userId, String code, BigDecimal amount);
+    void cashFlow(Operation operation);
+    void buy(Operation operation);
+    void sell(Operation operation);
 
 
 }
