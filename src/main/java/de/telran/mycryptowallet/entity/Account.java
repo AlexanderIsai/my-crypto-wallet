@@ -1,14 +1,9 @@
 package de.telran.mycryptowallet.entity;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
-
 
 /**
  * Entity Account
@@ -41,4 +36,7 @@ public class Account {
 
     @Column(name = "balance")
     private BigDecimal balance;
+
+    @Column(name = "order_balance")
+    private BigDecimal orderBalance;
 }

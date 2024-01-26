@@ -1,7 +1,11 @@
 package de.telran.mycryptowallet.service.interfaces;
 
 import de.telran.mycryptowallet.dto.AccountAddDTO;
+import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.Account;
+import de.telran.mycryptowallet.entity.Currency;
+import de.telran.mycryptowallet.entity.Operation;
+import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -42,6 +46,8 @@ public interface AccountService {
 
     void deposit(Long id, BigDecimal amount);
     void withdraw(Long id, BigDecimal amount);
+
+    void reserveForOrder(OrderAddDTO orderAddDTO);
 
 
 

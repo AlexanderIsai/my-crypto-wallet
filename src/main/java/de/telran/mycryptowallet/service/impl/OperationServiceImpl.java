@@ -24,7 +24,6 @@ public class OperationServiceImpl implements OperationService {
     private final AccountService accountService;
     private  final CurrencyService currencyService;
     private final RateService rateService;
-    private final String BASIC_CURRENCY = "USDT";
     @Override
     @Transactional
     public void addOperation(OperationAddDTO operationAddDTO) {
@@ -72,7 +71,7 @@ public class OperationServiceImpl implements OperationService {
 
     @Override
     public void buy(Operation operation) {
-        Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), BASIC_CURRENCY).orElseThrow();
+        Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
         Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
         accountService.withdraw(accountSell.getId(), operation.getAmount().multiply(operation.getRateValue()));
         accountService.deposit(accountBuy.getId(), operation.getAmount());
@@ -80,7 +79,7 @@ public class OperationServiceImpl implements OperationService {
 
     @Override
     public void sell(Operation operation) {
-        Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), BASIC_CURRENCY).orElseThrow();
+        Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
         Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
         accountService.withdraw(accountSell.getId(), operation.getAmount());
         accountService.deposit(accountBuy.getId(), operation.getAmount().multiply(operation.getRateValue()));

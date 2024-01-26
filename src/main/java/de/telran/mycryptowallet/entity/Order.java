@@ -27,10 +27,6 @@ public class Order {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "account_id")
-    private Account account;
-
-    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -38,9 +34,9 @@ public class Order {
     @JoinColumn(name = "currency", referencedColumnName = "code")
     private Currency currency;
 
-    @ManyToOne
-    @JoinColumn(name = "rate_id")
-    private Rate rate;
+
+    @Column(name = "rate")
+    private BigDecimal rateValue;
 
     @Column(name = "amount")
     private BigDecimal amount;

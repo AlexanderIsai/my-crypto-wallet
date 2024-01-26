@@ -34,7 +34,7 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping(value = "/user-id/{id}")
+    @GetMapping(value = "/{id}")
     public ResponseEntity<User> showUserById(@PathVariable(value = "id") Long id) {
         User user = userService.getUserById(id);
         if (user != null) {
@@ -56,7 +56,7 @@ public class UserController {
         }
     }
 
-    @GetMapping(value = "")
+    @GetMapping(value = "/email")
     public ResponseEntity<User> showUserByEmail(@RequestParam(value = "email") String email) {
         return ResponseEntity.ok(userService.getUserByEmail(email).orElseThrow());
     }
@@ -66,12 +66,12 @@ public class UserController {
         userService.updateUser(id, user);
     }
 
-    @GetMapping(value = "/users-by-status")
+    @GetMapping(value = "/status")
     public List<User> showUsersByStatus(@RequestParam(name = "status") UserStatus status) {
         return userService.getUsersByStatus(status);
     }
 
-    @GetMapping(value = "/user-exist")
+    @GetMapping(value = "/exist")
     public Boolean isExistUserByEmail(@RequestParam(name = "email") String email) {
         return userService.isExistUserByEmail(email);
     }

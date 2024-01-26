@@ -6,5 +6,5 @@ package de.telran.mycryptowallet.entity.entityEnum;
  * @author Alexander Isai on 18.01.2024.
  */
 public enum OperationType {
-    BUY, SELL, DEPOSIT, WITHDRAW, RESERVE
+    BUY, SELL, DEPOSIT, WITHDRAW, ORDER
 }

@@ -17,4 +17,5 @@ public interface CurrencyService {
     Boolean isExistCurrencyByCode(String code);
     Currency getCurrencyByCode(String code);
     Currency getCurrencyByTitle(String title);
+    String getBasicCurrency();
 }

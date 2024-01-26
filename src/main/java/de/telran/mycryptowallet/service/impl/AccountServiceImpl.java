@@ -1,7 +1,11 @@
 package de.telran.mycryptowallet.service.impl;
 
 import de.telran.mycryptowallet.dto.AccountAddDTO;
+import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.Account;
+import de.telran.mycryptowallet.entity.Currency;
+import de.telran.mycryptowallet.entity.User;
+import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.repository.AccountRepository;
 import de.telran.mycryptowallet.repository.CurrencyRepository;
 import de.telran.mycryptowallet.service.interfaces.AccountService;
@@ -24,9 +28,10 @@ import java.util.Optional;
 @Service
 public class AccountServiceImpl implements AccountService {
 
-    public final AccountRepository accountRepository;
-    public final CurrencyService currencyService;
-    public final ActiveUserService activeUserService;
+    private final AccountRepository accountRepository;
+    private final CurrencyService currencyService;
+    private final ActiveUserService activeUserService;
+
     @Override
     public void addNewAccount(AccountAddDTO accountAddDTO) {
         Account account = new Account();
@@ -34,6 +39,7 @@ public class AccountServiceImpl implements AccountService {
         account.setPublicAddress(PublicAddressGenerator.generatePublicAddress(accountAddDTO.getCurrencyCode()));
         account.setCurrency(currencyService.getCurrencyByCode(accountAddDTO.getCurrencyCode()));
         account.setBalance(BigDecimal.ZERO);
+        account.setOrderBalance(BigDecimal.ZERO);
         accountRepository.save(account);
     }
 
@@ -111,5 +117,25 @@ public class AccountServiceImpl implements AccountService {
         account.setBalance(account.getBalance().subtract(amount));
         updateAccount(id, account);
     }
+
+    @Override
+    public void reserveForOrder(OrderAddDTO orderAddDTO) {
+        User user = activeUserService.getActiveUser();
+        switch (orderAddDTO.getOperationType()){
+            case BUY:
+                Account accountBuy = accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), currencyService.getBasicCurrency()).orElseThrow();
+                accountBuy.setOrderBalance(accountBuy.getOrderBalance().add(orderAddDTO.getAmount().multiply(orderAddDTO.getOrderRate())));
+                accountBuy.setBalance(accountBuy.getBalance().subtract(orderAddDTO.getAmount().multiply(orderAddDTO.getOrderRate())));
+                updateAccount(accountBuy.getId(), accountBuy);
+                break;
+            case SELL:
+                Account accountSell = accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), orderAddDTO.getCurrencyCode()).orElseThrow();
+                accountSell.setOrderBalance(accountSell.getOrderBalance().add(orderAddDTO.getAmount()));
+                accountSell.setBalance(accountSell.getBalance().subtract(orderAddDTO.getAmount()));
+                updateAccount(accountSell.getId(), accountSell);
+        }
+    }
     //TODO проверить, достаточно ли средств
+
+
 }

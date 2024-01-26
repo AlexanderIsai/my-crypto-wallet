@@ -18,6 +18,7 @@ import java.util.List;
 public class CurrencyServiceImpl implements CurrencyService {
 
     private final CurrencyRepository currencyRepository;
+    private final String BASIC_CURRENCY = "USDT";
 
     @Override
     public void addCurrency(Currency currency) {
@@ -42,5 +43,10 @@ public class CurrencyServiceImpl implements CurrencyService {
     @Override
     public Currency getCurrencyByTitle(String title) {
         return currencyRepository.findCurrencyByTitleContainsIgnoreCase(title);
+    }
+
+    @Override
+    public String getBasicCurrency() {
+        return BASIC_CURRENCY;
     }
 }

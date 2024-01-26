@@ -35,12 +35,12 @@ public class AccountController {
         return accountService.getAllAccounts();
     }
 
-    @GetMapping(value = "")
+    @GetMapping(value = "/user")
     public List<Account> showAccountsByUser(@RequestParam(name = "userId") Long userId) {
         return accountService.getAccountsByUser(userId);
     }
 
-    @GetMapping(value = "")
+    @GetMapping(value = "/code")
     public List<Account> showAccountsByCurrency(@RequestParam(name = "code") String code) {
         return accountService.getAccountsByCurrency(code);
     }
