@@ -17,18 +17,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query(nativeQuery = true, value = "SELECT * FROM crypto_orders")
     List<Order> getAllOrders();
-
-    Optional<Order> findOrderById(Long id);
-
+    Order findOrderById(Long id);
     List<Order> findOrdersByUserId(Long userId);
-
-
     List<Order> findOrdersByCurrencyCode(String code);
-
     List<Order> findOrdersByUserIdAndCurrencyCode(Long userId, String code);
-
     List<Order> findOrdersByStatus(OrderStatus status);
-
     List<Order> findOrdersByUserIdAndStatus(Long userId, OrderStatus status);
 
 

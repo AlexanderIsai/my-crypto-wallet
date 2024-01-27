@@ -64,9 +64,8 @@ public class OperationServiceImpl implements OperationService {
                 break;
             case SELL:
                 sell(operation);
+                break;
         }
-
-
     }
 
     @Override
@@ -83,5 +82,15 @@ public class OperationServiceImpl implements OperationService {
         Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
         accountService.withdraw(accountSell.getId(), operation.getAmount());
         accountService.deposit(accountBuy.getId(), operation.getAmount().multiply(operation.getRateValue()));
+    }
+
+    @Override
+    public void transfer(Long fromId, Long toId, BigDecimal amount) {
+        Account sender = accountService.getAccountById(fromId);
+        Account receiver = accountService.getAccountById(toId);
+        sender.setBalance(sender.getBalance().subtract(amount));
+        accountService.updateAccount(sender.getId(), sender);
+        receiver.setBalance(receiver.getBalance().add(amount));
+        accountService.updateAccount(receiver.getId(), receiver);
     }
 }

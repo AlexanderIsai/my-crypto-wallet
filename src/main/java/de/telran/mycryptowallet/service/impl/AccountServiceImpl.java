@@ -4,6 +4,7 @@ import de.telran.mycryptowallet.dto.AccountAddDTO;
 import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Currency;
+import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.repository.AccountRepository;
@@ -133,9 +134,23 @@ public class AccountServiceImpl implements AccountService {
                 accountSell.setOrderBalance(accountSell.getOrderBalance().add(orderAddDTO.getAmount()));
                 accountSell.setBalance(accountSell.getBalance().subtract(orderAddDTO.getAmount()));
                 updateAccount(accountSell.getId(), accountSell);
+                break;
         }
     }
+
+    @Override
+    public Account getAccountFromOrder(Order order) {
+        if(order.getType().equals(OperationType.BUY)){
+            return accountRepository.findAccountByUserIdAndCurrencyCode(order.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
+        }
+        else {
+            return accountRepository.findAccountByUserIdAndCurrencyCode(order.getUser().getId(), order.getCurrency().getCode()).orElseThrow();
+        }
+
+    }
     //TODO проверить, достаточно ли средств
+
+
 
 
 }

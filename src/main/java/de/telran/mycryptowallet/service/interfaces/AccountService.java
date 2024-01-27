@@ -5,6 +5,7 @@ import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Currency;
 import de.telran.mycryptowallet.entity.Operation;
+import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 
 import java.math.BigDecimal;
@@ -19,35 +20,22 @@ import java.util.Optional;
 public interface AccountService {
 
     void addNewAccount(AccountAddDTO accountAddDTO);
-
     List<Account> getAllAccounts();
-
     List<Account> getAccountsByUser(Long userId);
-
     List<Account> getAccountsByCurrency(String code);
-
     Account getAccountByPublicAddress(String address);
-
     Account getAccountById(Long id);
-
     List<Account> getAccountsByBalanceGreaterThan(BigDecimal amount);
-
     List<Account> getAccountsByBalanceLessThan(BigDecimal amount);
-
     Boolean existsAccountById(Long id);
-
     Boolean existsAccountByUserIdAndCurrency(Long userId, String code);
-
     void updateAccount(Long id, Account account);
-
     List<Account> getAccountsBetweenAmount(BigDecimal from, BigDecimal to);
-
     Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code);
-
     void deposit(Long id, BigDecimal amount);
     void withdraw(Long id, BigDecimal amount);
-
     void reserveForOrder(OrderAddDTO orderAddDTO);
+    Account getAccountFromOrder(Order order);
 
 
 

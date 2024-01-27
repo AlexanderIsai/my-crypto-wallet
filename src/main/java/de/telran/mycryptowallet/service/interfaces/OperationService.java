@@ -17,6 +17,7 @@ public interface OperationService {
     void cashFlow(Operation operation);
     void buy(Operation operation);
     void sell(Operation operation);
+    void transfer(Long fromId, Long toId, BigDecimal amount);
 
 
 }
