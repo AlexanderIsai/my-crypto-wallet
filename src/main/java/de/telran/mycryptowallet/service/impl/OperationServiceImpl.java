@@ -2,6 +2,7 @@ package de.telran.mycryptowallet.service.impl;
 import de.telran.mycryptowallet.dto.OperationAddDTO;
 import de.telran.mycryptowallet.entity.*;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
+import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
 import de.telran.mycryptowallet.repository.OperationRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
 import jakarta.transaction.Transactional;
@@ -24,7 +25,7 @@ public class OperationServiceImpl implements OperationService {
     private final RateService rateService;
     @Override
     @Transactional
-    public void addExchangeOperation(OperationAddDTO operationAddDTO) {
+    public void addExchangeOperation(OperationAddDTO operationAddDTO) throws NotEnoughFundsException {
         Operation operation = new Operation();
 
         User operationUser = activeUserService.getActiveUser();
@@ -80,7 +81,7 @@ public class OperationServiceImpl implements OperationService {
     }
 
     @Override
-    public void cashFlow(Operation operation) {
+    public void cashFlow(Operation operation) throws NotEnoughFundsException {
         switch (operation.getType()) {
             case DEPOSIT:
                 accountService.deposit(operation.getAccount().getId(), operation.getAmount());
@@ -98,7 +99,7 @@ public class OperationServiceImpl implements OperationService {
     }
 
     @Override
-    public void buy(Operation operation) {
+    public void buy(Operation operation) throws NotEnoughFundsException {
         Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
         Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
         accountService.withdraw(accountSell.getId(), operation.getAmount().multiply(operation.getRateValue()));
@@ -106,7 +107,7 @@ public class OperationServiceImpl implements OperationService {
     }
 
     @Override
-    public void sell(Operation operation) {
+    public void sell(Operation operation) throws NotEnoughFundsException {
         Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
         Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
         accountService.withdraw(accountSell.getId(), operation.getAmount());

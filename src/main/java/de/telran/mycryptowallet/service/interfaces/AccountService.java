@@ -7,6 +7,7 @@ import de.telran.mycryptowallet.entity.Currency;
 import de.telran.mycryptowallet.entity.Operation;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
+import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,7 +34,7 @@ public interface AccountService {
     List<Account> getAccountsBetweenAmount(BigDecimal from, BigDecimal to);
     Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code);
     void deposit(Long id, BigDecimal amount);
-    void withdraw(Long id, BigDecimal amount);
+    void withdraw(Long id, BigDecimal amount) throws NotEnoughFundsException;
     void reserveForOrder(OrderAddDTO orderAddDTO);
     Account getAccountFromOrder(Order order);
 

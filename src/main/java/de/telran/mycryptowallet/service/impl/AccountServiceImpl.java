@@ -7,6 +7,7 @@ import de.telran.mycryptowallet.entity.Currency;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
+import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
 import de.telran.mycryptowallet.repository.AccountRepository;
 import de.telran.mycryptowallet.repository.CurrencyRepository;
 import de.telran.mycryptowallet.service.interfaces.AccountService;
@@ -113,8 +114,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void withdraw(Long id, BigDecimal amount) {
+    public void withdraw(Long id, BigDecimal amount) throws NotEnoughFundsException {
         Account account = accountRepository.findAccountById(id);
+        if(account.getBalance().compareTo(amount) < 0){
+            throw new NotEnoughFundsException("Sorry, you don`t have enough money");
+        }
         account.setBalance(account.getBalance().subtract(amount));
         updateAccount(id, account);
     }
