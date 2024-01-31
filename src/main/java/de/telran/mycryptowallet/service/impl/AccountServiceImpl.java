@@ -152,6 +152,13 @@ public class AccountServiceImpl implements AccountService {
         }
 
     }
+
+    @Override
+    public void returnPartOrder(Account account, BigDecimal amount) {
+        account.setBalance(account.getBalance().subtract(amount));
+        account.setOrderBalance(amount);
+        updateAccount(account.getId(), account);
+    }
     //TODO проверить, достаточно ли средств
 
 

@@ -3,6 +3,7 @@ package de.telran.mycryptowallet.service.interfaces;
 import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.User;
+import de.telran.mycryptowallet.exceptions.NotActiveOrder;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +23,7 @@ public interface OrderService {
 
     Order getOrderById(Long id);
 
-    void executeOrder(Long orderId);
+    void executeOrder(Long orderId) throws NotActiveOrder;
 
     void cancelOrder(Long orderId);
 

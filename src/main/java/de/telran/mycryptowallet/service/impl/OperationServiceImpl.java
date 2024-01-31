@@ -49,7 +49,7 @@ public class OperationServiceImpl implements OperationService {
         operationRepository.save(operation);
     }
 
-    public void addOrderOperation(User orderOwner, User orderExecutor, Order order) {
+    public void addOrderOperation(User orderOwner, User orderExecutor, Order order, BigDecimal amount) {
         Operation operationBuy = new Operation();
         Operation operationSell = new Operation();
 
@@ -69,8 +69,8 @@ public class OperationServiceImpl implements OperationService {
         operationBuy.setRateValue(order.getRateValue());
         operationSell.setRateValue(order.getRateValue());
 
-        operationBuy.setAmount(order.getAmount());
-        operationSell.setAmount(order.getAmount());
+        operationBuy.setAmount(amount);
+        operationSell.setAmount(amount);
 
         operationBuy.setType(OperationType.BUY);
         operationSell.setType(OperationType.SELL);

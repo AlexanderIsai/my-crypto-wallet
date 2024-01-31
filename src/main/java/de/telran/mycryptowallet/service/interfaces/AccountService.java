@@ -37,6 +37,7 @@ public interface AccountService {
     void withdraw(Long id, BigDecimal amount) throws NotEnoughFundsException;
     void reserveForOrder(OrderAddDTO orderAddDTO);
     Account getAccountFromOrder(Order order);
+    void returnPartOrder(Account account, BigDecimal amount);
 
 
 

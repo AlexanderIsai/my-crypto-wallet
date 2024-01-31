@@ -5,6 +5,7 @@ import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.*;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.entity.entityEnum.OrderStatus;
+import de.telran.mycryptowallet.exceptions.NotActiveOrder;
 import de.telran.mycryptowallet.repository.OrderRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
 import jakarta.transaction.Transactional;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,8 +72,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void executeOrder(Long orderId) {
-        Order order = getOrderById(orderId); // нужный ордер
+    public void executeOrder(Long orderId) throws NotActiveOrder {
+        Order order = getOrderById(orderId);// нужный ордер
+        if (!order.getStatus().equals(OrderStatus.ACTIVE)){
+            throw new NotActiveOrder("This order is not active");
+        }
         User executorOrder = activeUserService.getActiveUser(); //юзер, который хочет его выполнить
         User ownerOrder = userService.getUserById(order.getUser().getId());//юзер, который владеет ордером
         Account ownerBasicAccount = accountService.getAccountByUserIdAndCurrency(ownerOrder.getId(), currencyService.getBasicCurrency()).orElseThrow(); //счет владельца ордера в базовой валюте (доллар), потому что он хочет купить крипту
@@ -82,20 +87,43 @@ public class OrderServiceImpl implements OrderService {
         OperationType operationType = order.getType();
 
         cancelOrder(order.getId());
+        BigDecimal transferAmount;
+
         if (operationType.equals(OperationType.BUY)){
-            operationService.transfer(ownerBasicAccount.getId(), executerBasicAccount.getId(), order.getAmount().multiply(order.getRateValue()));// с долларового счета владельца ордера переводим бабло на долларовый счет исполнителя ордера
-            operationService.transfer(executerOrderAccount.getId(), ownerOrderAccount.getId(), order.getAmount());
-            operationService.addOrderOperation(ownerOrder, executorOrder, order);
+
+            if(executerOrderAccount.getBalance().compareTo(order.getAmount()) >= 0) {
+                transferAmount = order.getAmount();
+                order.setStatus(OrderStatus.DONE);
+            }
+            else {
+                transferAmount = executerOrderAccount.getBalance();
+                order.setStatus(OrderStatus.ACTIVE);
+                order.setAmount(order.getAmount().subtract(transferAmount));
+            }
+            operationService.transfer(ownerBasicAccount.getId(), executerBasicAccount.getId(), transferAmount.multiply(order.getRateValue()));// с долларового счета владельца ордера переводим бабло на долларовый счет исполнителя ордера
+            operationService.transfer(executerOrderAccount.getId(), ownerOrderAccount.getId(), transferAmount);
+            operationService.addOrderOperation(ownerOrder, executorOrder, order, transferAmount);
+            accountService.returnPartOrder(ownerOrderAccount, order.getAmount());
+
         }
         else {
-            operationService.transfer(executerBasicAccount.getId(), ownerBasicAccount.getId(), order.getAmount().multiply(order.getRateValue()));// с долларового счета владельца ордера переводим бабло на долларовый счет исполнителя ордера
-            operationService.transfer(ownerOrderAccount.getId(), executerOrderAccount.getId(), order.getAmount());
-            operationService.addOrderOperation(executorOrder, ownerOrder, order);
+            if(executerBasicAccount.getBalance().compareTo(order.getAmount().multiply(order.getRateValue())) >= 0) {
+                transferAmount = order.getAmount();
+                order.setStatus(OrderStatus.DONE);
+            }
+            else {
+                transferAmount = executerBasicAccount.getBalance().divide(order.getRateValue(), 2, RoundingMode.HALF_DOWN).subtract(BigDecimal.valueOf(0.01));
+                order.setStatus(OrderStatus.ACTIVE);
+                order.setAmount(order.getAmount().subtract(transferAmount));
+            }
+            operationService.transfer(executerBasicAccount.getId(), ownerBasicAccount.getId(), transferAmount.multiply(order.getRateValue()));// с долларового счета владельца ордера переводим бабло на долларовый счет исполнителя ордера
+            operationService.transfer(ownerOrderAccount.getId(), executerOrderAccount.getId(), transferAmount);
+            operationService.addOrderOperation(executorOrder, ownerOrder, order, transferAmount);
+            accountService.returnPartOrder(ownerOrderAccount, order.getAmount());
+
         }
-        order.setStatus(OrderStatus.DONE);
         orderRepository.save(order);
     }
-    //TODO подумать про добавление операций
     @Override
     public void cancelOrder(Long orderId) {
         Order order = orderRepository.findOrderById(orderId);

@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 public interface OperationService {
 
     void addExchangeOperation(OperationAddDTO operationAddDTO) throws NotEnoughFundsException;
-    void addOrderOperation(User orderOwner, User orderExecutor, Order order);
+    void addOrderOperation(User orderOwner, User orderExecutor, Order order, BigDecimal amount);
     void cashFlow(Operation operation) throws NotEnoughFundsException;
     void buy(Operation operation) throws NotEnoughFundsException;
     void sell(Operation operation) throws NotEnoughFundsException;
