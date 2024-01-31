@@ -35,7 +35,7 @@ public interface AccountService {
     Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code);
     void deposit(Long id, BigDecimal amount);
     void withdraw(Long id, BigDecimal amount) throws NotEnoughFundsException;
-    void reserveForOrder(OrderAddDTO orderAddDTO);
+    void reserveForOrder(OrderAddDTO orderAddDTO) throws NotEnoughFundsException;
     Account getAccountFromOrder(Order order);
     void returnPartOrder(Account account, BigDecimal amount);
 

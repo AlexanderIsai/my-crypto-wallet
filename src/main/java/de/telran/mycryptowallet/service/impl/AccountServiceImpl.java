@@ -13,6 +13,7 @@ import de.telran.mycryptowallet.repository.CurrencyRepository;
 import de.telran.mycryptowallet.service.interfaces.AccountService;
 import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
 import de.telran.mycryptowallet.service.interfaces.CurrencyService;
+import de.telran.mycryptowallet.service.utils.BalanceValidator;
 import de.telran.mycryptowallet.service.utils.PublicAddressGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -116,25 +117,25 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void withdraw(Long id, BigDecimal amount) throws NotEnoughFundsException {
         Account account = accountRepository.findAccountById(id);
-        if(account.getBalance().compareTo(amount) < 0){
-            throw new NotEnoughFundsException("Sorry, you don`t have enough money");
-        }
+        BalanceValidator.isEnoughMoney(account, amount);
         account.setBalance(account.getBalance().subtract(amount));
         updateAccount(id, account);
     }
 
     @Override
-    public void reserveForOrder(OrderAddDTO orderAddDTO) {
+    public void reserveForOrder(OrderAddDTO orderAddDTO) throws NotEnoughFundsException {
         User user = activeUserService.getActiveUser();
         switch (orderAddDTO.getOperationType()){
             case BUY:
                 Account accountBuy = accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), currencyService.getBasicCurrency()).orElseThrow();
+                BalanceValidator.isEnoughMoney(accountBuy, orderAddDTO.getAmount().multiply(orderAddDTO.getOrderRate()));
                 accountBuy.setOrderBalance(accountBuy.getOrderBalance().add(orderAddDTO.getAmount().multiply(orderAddDTO.getOrderRate())));
                 accountBuy.setBalance(accountBuy.getBalance().subtract(orderAddDTO.getAmount().multiply(orderAddDTO.getOrderRate())));
                 updateAccount(accountBuy.getId(), accountBuy);
                 break;
             case SELL:
                 Account accountSell = accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), orderAddDTO.getCurrencyCode()).orElseThrow();
+                BalanceValidator.isEnoughMoney(accountSell, orderAddDTO.getAmount());
                 accountSell.setOrderBalance(accountSell.getOrderBalance().add(orderAddDTO.getAmount()));
                 accountSell.setBalance(accountSell.getBalance().subtract(orderAddDTO.getAmount()));
                 updateAccount(accountSell.getId(), accountSell);

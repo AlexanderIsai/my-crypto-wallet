@@ -6,6 +6,7 @@ import de.telran.mycryptowallet.entity.*;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.entity.entityEnum.OrderStatus;
 import de.telran.mycryptowallet.exceptions.NotActiveOrder;
+import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
 import de.telran.mycryptowallet.repository.OrderRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
 import jakarta.transaction.Transactional;
@@ -35,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void addOrder(OrderAddDTO orderDTO) {
+    public void addOrder(OrderAddDTO orderDTO) throws NotEnoughFundsException {
         Order order = new Order();
 
         User orderUser = activeUserService.getActiveUser();
@@ -50,8 +51,9 @@ public class OrderServiceImpl implements OrderService {
 
         order.setType(orderDTO.getOperationType());
         order.setStatus(OrderStatus.ACTIVE);
-        orderRepository.save(order);
+
         accountService.reserveForOrder(orderDTO);
+        orderRepository.save(order);
     }
 
     @Override
@@ -129,8 +131,9 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findOrderById(orderId);
         order.setStatus(OrderStatus.CANCELLED);
         Account orderAccount = accountService.getAccountFromOrder(order);//аккаунт, где заморожены деньги
-        BigDecimal orderAmount = orderAccount.getOrderBalance();
-        orderAccount.setOrderBalance(BigDecimal.ZERO);
+
+        BigDecimal orderAmount = order.getAmount();
+        orderAccount.setOrderBalance(orderAccount.getOrderBalance().subtract(orderAmount));
         orderAccount.setBalance(orderAccount.getBalance().add(orderAmount));
         accountService.updateAccount(orderAccount.getId(), orderAccount);
         updateOrder(orderId, order);

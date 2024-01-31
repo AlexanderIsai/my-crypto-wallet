@@ -4,6 +4,7 @@ import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.exceptions.NotActiveOrder;
+import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +16,7 @@ import java.util.Optional;
  */
 public interface OrderService {
 
-    void addOrder(OrderAddDTO orderDTO);
+    void addOrder(OrderAddDTO orderDTO) throws NotEnoughFundsException;
 
     List<Order> getAllOrders();
 
