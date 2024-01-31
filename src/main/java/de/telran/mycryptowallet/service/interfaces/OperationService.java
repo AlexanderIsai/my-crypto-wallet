@@ -2,7 +2,8 @@ package de.telran.mycryptowallet.service.interfaces;
 
 import de.telran.mycryptowallet.dto.OperationAddDTO;
 import de.telran.mycryptowallet.entity.Operation;
-import de.telran.mycryptowallet.entity.entityEnum.OperationType;
+import de.telran.mycryptowallet.entity.Order;
+import de.telran.mycryptowallet.entity.User;
 
 import java.math.BigDecimal;
 
@@ -13,7 +14,8 @@ import java.math.BigDecimal;
  */
 public interface OperationService {
 
-    void addOperation(OperationAddDTO operationAddDTO);
+    void addExchangeOperation(OperationAddDTO operationAddDTO);
+    void addOrderOperation(User orderOwner, User orderExecutor, Order order);
     void cashFlow(Operation operation);
     void buy(Operation operation);
     void sell(Operation operation);

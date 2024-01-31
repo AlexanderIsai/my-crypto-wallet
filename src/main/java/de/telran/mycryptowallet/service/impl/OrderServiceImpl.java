@@ -1,5 +1,6 @@
 package de.telran.mycryptowallet.service.impl;
 
+import de.telran.mycryptowallet.dto.OperationAddDTO;
 import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.*;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
@@ -68,6 +69,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void executeOrder(Long orderId) {
         Order order = getOrderById(orderId); // нужный ордер
         User executorOrder = activeUserService.getActiveUser(); //юзер, который хочет его выполнить
@@ -78,18 +80,22 @@ public class OrderServiceImpl implements OrderService {
         Account executerBasicAccount = accountService.getAccountByUserIdAndCurrency(executorOrder.getId(), currencyService.getBasicCurrency()).orElseThrow(); //счет исполнителя ордера в базовой валюте (доллар), потому что он хочет продать крипту
         Account executerOrderAccount = accountService.getAccountByUserIdAndCurrency(executorOrder.getId(), order.getCurrency().getCode()).orElseThrow(); //счет исполнителя ордера в валюте ордера - сейчас Биток
         OperationType operationType = order.getType();
+
         cancelOrder(order.getId());
         if (operationType.equals(OperationType.BUY)){
             operationService.transfer(ownerBasicAccount.getId(), executerBasicAccount.getId(), order.getAmount().multiply(order.getRateValue()));// с долларового счета владельца ордера переводим бабло на долларовый счет исполнителя ордера
             operationService.transfer(executerOrderAccount.getId(), ownerOrderAccount.getId(), order.getAmount());
+            operationService.addOrderOperation(ownerOrder, executorOrder, order);
         }
         else {
             operationService.transfer(executerBasicAccount.getId(), ownerBasicAccount.getId(), order.getAmount().multiply(order.getRateValue()));// с долларового счета владельца ордера переводим бабло на долларовый счет исполнителя ордера
             operationService.transfer(ownerOrderAccount.getId(), executerOrderAccount.getId(), order.getAmount());
+            operationService.addOrderOperation(executorOrder, ownerOrder, order);
         }
         order.setStatus(OrderStatus.DONE);
         orderRepository.save(order);
     }
+    //TODO подумать про добавление операций
     @Override
     public void cancelOrder(Long orderId) {
         Order order = orderRepository.findOrderById(orderId);

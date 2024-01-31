@@ -16,10 +16,14 @@ import java.util.Set;
 
 /**
  * Entity User
- *
- * @author Alexander Isai on 16.01.2024.
- * description. The basic essence of the application. Protected by SpringSecurity.
- * It has fields - username, e-mail, password, role, status, account list
+
+ * @author Alexander Isai
+ * @version 1.0
+ * @since 16.01.2024
+ * Entity User in the cryptocurrency wallet application.
+ * It is designed to work with Spring Security for authentication and authorization purposes.
+ * This class includes basic user information such as username, email, and password,
+ * as well as user role and status for access control.
  */
 @Entity
 @Table(name = "crypto_users")
@@ -47,42 +51,63 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-//    @OneToMany(mappedBy = "user")
-//    private Set<Account> accounts = new HashSet<>();
-    //TODO определиться - нужно ли юзеру это поле
-
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-
+    /**
+     *  Retrieves the authorities (permissions) granted to the user.
+     *  In this implementation, user's role is converted to a {@link GrantedAuthority}.
+     *  @return A collection of the user's granted authorities.
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority(this.getRole().name()));
         return authorities;
     }
-
+    /**
+     * Retrieves the username of the user.
+     *
+     * @return The username of the user.
+     */
     @Override
     public String getUsername() {
         return userName;
     }
 
+    /**
+     * Indicates whether the user's account has expired.
+     *
+     * @return true if the user's account is valid (non-expired), false otherwise.
+     */
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
-
+    /**
+     * Checks if the user's account is locked.
+     *
+     * @return true if the user's account is not locked, false otherwise.
+     */
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
-
+    /**
+     * Indicates whether the user's credentials (password) have expired.
+     *
+     * @return true if the user's credentials are valid (non-expired), false otherwise.
+     */
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
-
+    /**
+     * Checks if the user is enabled or disabled.
+     *
+     * @return true if the user is enabled, false otherwise.
+     */
     @Override
     public boolean isEnabled() {
         return true;

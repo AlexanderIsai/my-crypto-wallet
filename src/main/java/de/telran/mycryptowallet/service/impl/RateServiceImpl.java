@@ -55,4 +55,9 @@ public class RateServiceImpl implements RateService {
         }
         return rate;
     }
+
+    @Override
+    public Rate setOrderRate(BigDecimal rateValue) {
+        return null;
+    }
 }

@@ -40,7 +40,7 @@ public class PublicAddressGenerator {
         address.append(START_ADDRESS[2]);
 
         for (int i = 1; i < ADDRESS_LENGTH; i++) {
-            address.append(ALPHABET.charAt(random.nextInt(ALPHABET.length())));
+            address.append(ALPHABET.charAt(random.nextInt(ALPHABET.length() - 1)));
         }
 
         return address.toString();
