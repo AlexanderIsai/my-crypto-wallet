@@ -2,6 +2,7 @@ package de.telran.mycryptowallet.controller;
 
 import de.telran.mycryptowallet.dto.AccountAddDTO;
 import de.telran.mycryptowallet.entity.Account;
+import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 import de.telran.mycryptowallet.service.interfaces.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -5,6 +5,7 @@ import de.telran.mycryptowallet.entity.Operation;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
+import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 
 import java.math.BigDecimal;
 
@@ -15,7 +16,7 @@ import java.math.BigDecimal;
  */
 public interface OperationService {
 
-    void addExchangeOperation(OperationAddDTO operationAddDTO) throws NotEnoughFundsException;
+    void addExchangeOperation(OperationAddDTO operationAddDTO) throws NotEnoughFundsException, UserIsBlockedException;
     void addOrderOperation(User orderOwner, User orderExecutor, Order order, BigDecimal amount);
     void cashFlow(Operation operation) throws NotEnoughFundsException;
     void buy(Operation operation) throws NotEnoughFundsException;

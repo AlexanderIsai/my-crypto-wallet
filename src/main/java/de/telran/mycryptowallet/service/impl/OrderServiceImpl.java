@@ -1,14 +1,15 @@
 package de.telran.mycryptowallet.service.impl;
 
-import de.telran.mycryptowallet.dto.OperationAddDTO;
 import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.*;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.entity.entityEnum.OrderStatus;
-import de.telran.mycryptowallet.exceptions.NotActiveOrder;
+import de.telran.mycryptowallet.exceptions.NotActiveOrderException;
 import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
+import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 import de.telran.mycryptowallet.repository.OrderRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
+import de.telran.mycryptowallet.service.utils.validators.OrderValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * description
@@ -33,10 +33,11 @@ public class OrderServiceImpl implements OrderService {
     private final CurrencyService currencyService;
     private final UserService userService;
     private final OperationService operationService;
+    private final OrderValidator orderValidator;
 
     @Override
     @Transactional
-    public void addOrder(OrderAddDTO orderDTO) throws NotEnoughFundsException {
+    public void addOrder(OrderAddDTO orderDTO) {
         Order order = new Order();
 
         User orderUser = activeUserService.getActiveUser();
@@ -74,11 +75,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void executeOrder(Long orderId) throws NotActiveOrder {
+    public void executeOrder(Long orderId) {
         Order order = getOrderById(orderId);// нужный ордер
-        if (!order.getStatus().equals(OrderStatus.ACTIVE)){
-            throw new NotActiveOrder("This order is not active");
-        }
+        orderValidator.isOrderActive(order);
         User executorOrder = activeUserService.getActiveUser(); //юзер, который хочет его выполнить
         User ownerOrder = userService.getUserById(order.getUser().getId());//юзер, который владеет ордером
         Account ownerBasicAccount = accountService.getAccountByUserIdAndCurrency(ownerOrder.getId(), currencyService.getBasicCurrency()).orElseThrow(); //счет владельца ордера в базовой валюте (доллар), потому что он хочет купить крипту

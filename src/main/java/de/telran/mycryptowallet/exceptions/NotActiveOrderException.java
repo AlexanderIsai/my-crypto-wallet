@@ -5,9 +5,9 @@ package de.telran.mycryptowallet.exceptions;
  *
  * @author Alexander Isai on 31.01.2024.
  */
-public class NotActiveOrder extends Exception{
+public class NotActiveOrderException extends RuntimeException{
 
-    public NotActiveOrder(String message){
+    public NotActiveOrderException(String message){
         super(message);
     }
 }

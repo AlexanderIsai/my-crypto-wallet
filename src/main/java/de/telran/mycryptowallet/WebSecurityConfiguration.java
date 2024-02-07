@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -29,7 +30,8 @@ public class WebSecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(request -> {
-                    request.requestMatchers(HttpMethod.GET, "/users/show-all-users").hasRole("ADMIN");
+                    request.requestMatchers(HttpMethod.GET, "/admin/show-all-users").hasRole("ADMIN");
+                    request.requestMatchers(HttpMethod.POST, "/currency/add-new-currency").hasRole("ADMIN");
                     request.anyRequest().permitAll();
                 })
                 .formLogin(formLogin -> formLogin.disable())
@@ -54,8 +56,8 @@ public class WebSecurityConfiguration {
     }
     @Bean
     public PasswordEncoder passwordEncoder() {
-
-        return NoOpPasswordEncoder.getInstance();
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        return bCryptPasswordEncoder;
     }
 }
 //TODO повторить и разобраться в деталях авторизации

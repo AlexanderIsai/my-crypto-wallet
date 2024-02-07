@@ -1,14 +1,13 @@
 package de.telran.mycryptowallet.controller;
-
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
 import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
 import de.telran.mycryptowallet.service.interfaces.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 /**
@@ -25,13 +24,8 @@ public class UserController {
     private final ActiveUserService activeUserService;
 
     @PostMapping(value = "/add-new-user")
-    public void save(@RequestBody User user) {
+    public void save(@RequestBody @Valid User user) {
         userService.addNewUser(user);
-    }
-
-    @GetMapping(value = "/show-all-users")
-    public List<User> showAllUsers() {
-        return userService.getAllUsers();
     }
 
     @GetMapping(value = "/{id}")
@@ -46,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/active-user")
-    public ResponseEntity<User> getActiveUser(){
+    public ResponseEntity<User> getActiveUser() {
         User user = activeUserService.getActiveUser();
         if (user != null) {
             return ResponseEntity.ok(user);
@@ -60,6 +54,7 @@ public class UserController {
     public ResponseEntity<User> showUserByEmail(@RequestParam(value = "email") String email) {
         return ResponseEntity.ok(userService.getUserByEmail(email).orElseThrow());
     }
+    //TODO доработать
 
     @PutMapping(value = "/{id}")
     public void updateUser(@PathVariable(value = "id") Long id, @RequestBody User user) {
@@ -74,5 +69,10 @@ public class UserController {
     @GetMapping(value = "/exist")
     public Boolean isExistUserByEmail(@RequestParam(name = "email") String email) {
         return userService.isExistUserByEmail(email);
+    }
+
+    @PutMapping(value = "block")
+    public void toggleBlockUser(@RequestParam(name = "id") Long id){
+        userService.toggleBlockUser(id);
     }
 }

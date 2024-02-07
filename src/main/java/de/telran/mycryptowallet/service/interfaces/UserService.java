@@ -27,4 +27,6 @@ public interface UserService {
 
     Boolean isExistUserByEmail(String email);
 
+    void toggleBlockUser(Long id);
+
 }

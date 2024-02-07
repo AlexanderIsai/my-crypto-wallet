@@ -3,8 +3,10 @@ import de.telran.mycryptowallet.dto.OperationAddDTO;
 import de.telran.mycryptowallet.entity.*;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
+import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 import de.telran.mycryptowallet.repository.OperationRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
+import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,9 +25,10 @@ public class OperationServiceImpl implements OperationService {
     private final AccountService accountService;
     private  final CurrencyService currencyService;
     private final RateService rateService;
+    private final AccountValidator accountValidator;
     @Override
     @Transactional
-    public void addExchangeOperation(OperationAddDTO operationAddDTO) throws NotEnoughFundsException {
+    public void addExchangeOperation(OperationAddDTO operationAddDTO) throws NotEnoughFundsException, UserIsBlockedException {
         Operation operation = new Operation();
 
         User operationUser = activeUserService.getActiveUser();
@@ -81,13 +84,13 @@ public class OperationServiceImpl implements OperationService {
     }
 
     @Override
-    public void cashFlow(Operation operation) throws NotEnoughFundsException {
+    public void cashFlow(Operation operation) {
         switch (operation.getType()) {
             case DEPOSIT:
                 accountService.deposit(operation.getAccount().getId(), operation.getAmount());
                 break;
             case WITHDRAW:
-                accountService.withdraw(operation.getAccount().getId(), operation.getAmount());
+                    accountService.withdraw(operation.getAccount().getId(), operation.getAmount());
                 break;
             case BUY:
                 buy(operation);

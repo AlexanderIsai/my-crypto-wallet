@@ -5,6 +5,7 @@ import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
 import de.telran.mycryptowallet.repository.UserRepository;
 import de.telran.mycryptowallet.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,8 +21,10 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     @Override
     public void addNewUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -54,5 +57,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean isExistUserByEmail(String email) {
         return userRepository.existsUserByEmail(email);
+    }
+
+    @Override
+    public void toggleBlockUser(Long id) {
+        User user = userRepository.findUserById(id);
+        if(!user.getStatus().equals(UserStatus.BLOCKED)){
+            user.setStatus(UserStatus.BLOCKED);
+        }
+        else {
+            user.setStatus(UserStatus.OFFLINE);
+        }
+        updateUser(user.getId(), user);
     }
 }

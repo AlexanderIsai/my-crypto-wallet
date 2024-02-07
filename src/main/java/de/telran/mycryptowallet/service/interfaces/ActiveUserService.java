@@ -1,6 +1,7 @@
 package de.telran.mycryptowallet.service.interfaces;
 
 import de.telran.mycryptowallet.entity.User;
+import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 
 /**
  * description
@@ -9,5 +10,5 @@ import de.telran.mycryptowallet.entity.User;
  */
 public interface ActiveUserService {
 
-    User getActiveUser();
+    User getActiveUser() throws UserIsBlockedException;
 }

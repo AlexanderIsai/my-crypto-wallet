@@ -26,6 +26,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsUserByEmail(String email);
 
+    Boolean existsUserByIdAndStatus(Long id, UserStatus status);
+
     @Query(nativeQuery = true, value = "SELECT * FROM crypto_users")
     List<User> getAllUsers();
 
