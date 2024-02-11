@@ -1,5 +1,4 @@
 package de.telran.mycryptowallet.service.utils.validators;
-
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.entityEnum.OrderStatus;
 import de.telran.mycryptowallet.exceptions.NotActiveOrderException;

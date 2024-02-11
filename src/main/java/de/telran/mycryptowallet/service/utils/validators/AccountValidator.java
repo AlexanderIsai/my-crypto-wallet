@@ -1,7 +1,9 @@
 package de.telran.mycryptowallet.service.utils.validators;
 
 import de.telran.mycryptowallet.entity.Account;
+import de.telran.mycryptowallet.exceptions.ExistAccountException;
 import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
+import de.telran.mycryptowallet.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,11 +18,17 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class AccountValidator {
 
+
     public void isEnoughMoney(Account account, BigDecimal amount) {
 
             if (account.getBalance().compareTo(amount) < 0){
                 throw new NotEnoughFundsException("Sorry! You don't have enough money. Should you something borrow");
             }
+    }
+    public void isExistUserAccount(Account account){
+        if(account == null){
+            throw new ExistAccountException("Account in this currency already exists for the user");
+        }
     }
 
 }

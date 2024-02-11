@@ -1,5 +1,4 @@
 package de.telran.mycryptowallet.service.impl;
-
 import de.telran.mycryptowallet.dto.AccountAddDTO;
 import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.Account;
@@ -7,7 +6,6 @@ import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.exceptions.ExistAccountException;
-import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 import de.telran.mycryptowallet.repository.AccountRepository;
 import de.telran.mycryptowallet.service.interfaces.AccountService;
 import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
@@ -16,7 +14,6 @@ import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
 import de.telran.mycryptowallet.service.utils.PublicAddressGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +31,7 @@ public class AccountServiceImpl implements AccountService {
     private final CurrencyService currencyService;
     private final ActiveUserService activeUserService;
     private final AccountValidator accountValidator;
+    private final PublicAddressGenerator publicAddressGenerator;
 
     @Override
     public void addNewAccount(AccountAddDTO accountAddDTO) {
@@ -42,7 +40,7 @@ public class AccountServiceImpl implements AccountService {
             }
             Account account = new Account();
             account.setUser(activeUserService.getActiveUser());
-            account.setPublicAddress(PublicAddressGenerator.generatePublicAddress(accountAddDTO.getCurrencyCode()));
+            account.setPublicAddress(publicAddressGenerator.generatePublicAddress(accountAddDTO.getCurrencyCode()));
             account.setCurrency(currencyService.getCurrencyByCode(accountAddDTO.getCurrencyCode()));
             account.setBalance(BigDecimal.ZERO);
             account.setOrderBalance(BigDecimal.ZERO);
@@ -128,7 +126,7 @@ public class AccountServiceImpl implements AccountService {
     public void reserveForOrder(OrderAddDTO orderAddDTO) {
         User user = activeUserService.getActiveUser();
         try {
-            if (!existsAccountByUserIdAndCurrency(activeUserService.getActiveUser().getId(), orderAddDTO.getCurrencyCode())) {
+            if (!existsAccountByUserIdAndCurrency(user.getId(), orderAddDTO.getCurrencyCode())) {
                 throw new ExistAccountException("Account does not exist");
             }
             switch (orderAddDTO.getOperationType()) {
@@ -163,7 +161,6 @@ public class AccountServiceImpl implements AccountService {
         }
 
     }
-
     @Override
     public void returnPartOrder(Account account, BigDecimal amount) {
         account.setBalance(account.getBalance().subtract(amount));
