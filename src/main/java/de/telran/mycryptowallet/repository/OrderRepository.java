@@ -1,7 +1,10 @@
 package de.telran.mycryptowallet.repository;
 
+import de.telran.mycryptowallet.dto.OrderShowDTO;
 import de.telran.mycryptowallet.entity.Order;
+import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.entity.entityEnum.OrderStatus;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,6 +26,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findOrdersByUserIdAndCurrencyCode(Long userId, String code);
     List<Order> findOrdersByStatus(OrderStatus status);
     List<Order> findOrdersByUserIdAndStatus(Long userId, OrderStatus status);
+
+    List<Order> findOrdersByStatusAndTypeAndCurrencyCode(OrderStatus status, OperationType type, String code, Sort sort);
+
 
 
 }

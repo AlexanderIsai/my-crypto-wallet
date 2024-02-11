@@ -4,6 +4,7 @@ import de.telran.mycryptowallet.dto.AccountAddDTO;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 import de.telran.mycryptowallet.service.interfaces.AccountService;
+import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
+    private final ActiveUserService activeUserService;
 
 
     @PostMapping(value = "/add")
@@ -31,21 +33,15 @@ public class AccountController {
         accountService.addNewAccount(accountAddDTO);
     }
 
-    @GetMapping(value = "/all")
-    public List<Account> showAllAccounts() {
-        return accountService.getAllAccounts();
-    }
-
-    @GetMapping(value = "/user")
-    public List<Account> showAccountsByUser(@RequestParam(name = "userId") Long userId) {
-        return accountService.getAccountsByUser(userId);
-    }
-
     @GetMapping(value = "/code")
     public List<Account> showAccountsByCurrency(@RequestParam(name = "code") String code) {
         return accountService.getAccountsByCurrency(code);
     }
 
+    @GetMapping(value = "/my")
+    public List<Account> showAccountsByUser() {
+        return accountService.getAccountsByUser(activeUserService.getActiveUser().getId());
+    }
     @GetMapping(value = "/user-currency")
     public Account showAccountByIdAndUserId(@RequestParam(name = "userId") Long userId, @RequestParam(name = "code") String code) {
         return accountService.getAccountByUserIdAndCurrency(userId, code).orElseThrow();

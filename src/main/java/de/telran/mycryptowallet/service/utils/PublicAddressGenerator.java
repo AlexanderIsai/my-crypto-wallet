@@ -1,5 +1,8 @@
 package de.telran.mycryptowallet.service.utils;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import java.util.Random;
 
 /**
@@ -7,12 +10,14 @@ import java.util.Random;
  *
  * @author Alexander Isai on 23.01.2024.
  */
+@Service
+@RequiredArgsConstructor
 public class PublicAddressGenerator {
-    private static final String ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-    private static final int ADDRESS_LENGTH = 34;
-    private static final String[] START_ADDRESS = {"1", "3", "0x"};
+    private final String ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    private final int ADDRESS_LENGTH = 34;
+    private final String[] START_ADDRESS = {"1", "3", "0x"};
 
-    public static String generatePublicAddress(String code){
+    public String generatePublicAddress(String code){
         return switch (code) {
             case "USDT" -> generateTetherAddress();
             case "BTC" -> generateBitcoinAddress();
@@ -20,7 +25,7 @@ public class PublicAddressGenerator {
         };
     }
 
-    public static String generateBitcoinAddress() {
+    public String generateBitcoinAddress() {
         StringBuilder address = new StringBuilder();
         Random random = new Random();
 
@@ -33,7 +38,7 @@ public class PublicAddressGenerator {
         return address.toString();
     }
 
-    public static String generateTetherAddress() {
+    public String generateTetherAddress() {
         StringBuilder address = new StringBuilder();
         Random random = new Random();
 

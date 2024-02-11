@@ -20,7 +20,6 @@ public class RateGenerator {
     @Value("${url.bitcoin}")
     private  String bitcoinUrl;
 
-    @Scheduled(cron = "0 */5 * * * *")
     public Map<String, Object> getBitcoinPrice() {
         RestTemplate restTemplate = new RestTemplate();
         String url = bitcoinUrl;

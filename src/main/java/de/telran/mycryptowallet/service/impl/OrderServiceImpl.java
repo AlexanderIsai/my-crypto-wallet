@@ -12,6 +12,7 @@ import de.telran.mycryptowallet.service.interfaces.*;
 import de.telran.mycryptowallet.service.utils.validators.OrderValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -60,6 +61,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> getAllOrders() {
         return orderRepository.getAllOrders();
+    }
+
+    @Override
+    public List<Order> getUsersOrders(Long userId) {
+        return orderRepository.findOrdersByUserId(userId);
     }
 
     @Override
@@ -136,5 +142,16 @@ public class OrderServiceImpl implements OrderService {
         orderAccount.setBalance(orderAccount.getBalance().add(orderAmount));
         accountService.updateAccount(orderAccount.getId(), orderAccount);
         updateOrder(orderId, order);
+    }
+
+    @Override
+    public List<Order> getOrdersByStatus(OrderStatus orderStatus) {
+        return orderRepository.findOrdersByStatus(orderStatus);
+    }
+
+    @Override
+    public List<Order> getOrdersByStatusTypeCurrency(OrderStatus status, OperationType type, String code) {
+        Sort sort = type.equals(OperationType.BUY) ? Sort.by(Sort.Direction.DESC, "rateValue") : Sort.by(Sort.Direction.ASC, "rateValue");
+        return orderRepository.findOrdersByStatusAndTypeAndCurrencyCode(status, type, code, sort);
     }
 }

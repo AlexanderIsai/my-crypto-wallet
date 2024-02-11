@@ -70,4 +70,12 @@ public class UserServiceImpl implements UserService {
         }
         updateUser(user.getId(), user);
     }
+
+    @Override
+    public void changeUserPassword(Long id, String newPassword) {
+        User user = userRepository.findUserById(id);
+        System.out.println(user);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        updateUser(id, user);
+    }
 }

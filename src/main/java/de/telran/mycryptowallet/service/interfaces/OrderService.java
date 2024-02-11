@@ -2,6 +2,8 @@ package de.telran.mycryptowallet.service.interfaces;
 
 import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.Order;
+import de.telran.mycryptowallet.entity.entityEnum.OperationType;
+import de.telran.mycryptowallet.entity.entityEnum.OrderStatus;
 import de.telran.mycryptowallet.exceptions.NotActiveOrderException;
 import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
 import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
@@ -15,17 +17,23 @@ import java.util.List;
  */
 public interface OrderService {
 
-    void addOrder(OrderAddDTO orderDTO) throws NotEnoughFundsException, UserIsBlockedException;
+    void addOrder(OrderAddDTO orderDTO);
 
     List<Order> getAllOrders();
+
+    List<Order> getUsersOrders(Long userId);
 
     void updateOrder(Long id, Order order);
 
     Order getOrderById(Long id);
 
-    void executeOrder(Long orderId) throws NotActiveOrderException, UserIsBlockedException;
+    void executeOrder(Long orderId);
 
     void cancelOrder(Long orderId);
+
+    List<Order> getOrdersByStatus(OrderStatus orderStatus);
+
+    List<Order> getOrdersByStatusTypeCurrency(OrderStatus status, OperationType type, String code);
 
 
 }

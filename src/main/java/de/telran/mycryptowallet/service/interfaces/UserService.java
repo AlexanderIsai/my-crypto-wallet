@@ -29,4 +29,6 @@ public interface UserService {
 
     void toggleBlockUser(Long id);
 
+    void changeUserPassword(Long id, String newPassword);
+
 }

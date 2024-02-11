@@ -23,12 +23,12 @@ public class OperationServiceImpl implements OperationService {
     private final OperationRepository operationRepository;
     private final ActiveUserService activeUserService;
     private final AccountService accountService;
-    private  final CurrencyService currencyService;
+    private final CurrencyService currencyService;
     private final RateService rateService;
     private final AccountValidator accountValidator;
     @Override
     @Transactional
-    public void addExchangeOperation(OperationAddDTO operationAddDTO) throws NotEnoughFundsException, UserIsBlockedException {
+    public void addExchangeOperation(OperationAddDTO operationAddDTO) {
         Operation operation = new Operation();
 
         User operationUser = activeUserService.getActiveUser();
