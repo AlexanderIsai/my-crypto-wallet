@@ -35,6 +35,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserService userService;
     private final OperationService operationService;
     private final OrderValidator orderValidator;
+    private final int SCALE = 2;
 
     @Override
     @Transactional
@@ -119,7 +120,7 @@ public class OrderServiceImpl implements OrderService {
                 order.setStatus(OrderStatus.DONE);
             }
             else {
-                transferAmount = executerBasicAccount.getBalance().divide(order.getRateValue(), 2, RoundingMode.HALF_DOWN).subtract(BigDecimal.valueOf(0.01));
+                transferAmount = executerBasicAccount.getBalance().divide(order.getRateValue(), SCALE, RoundingMode.HALF_DOWN).subtract(BigDecimal.valueOf(0.01));
                 order.setStatus(OrderStatus.ACTIVE);
                 order.setAmount(order.getAmount().subtract(transferAmount));
             }

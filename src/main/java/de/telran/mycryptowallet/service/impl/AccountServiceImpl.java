@@ -3,19 +3,21 @@ import de.telran.mycryptowallet.dto.AccountAddDTO;
 import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Order;
+import de.telran.mycryptowallet.entity.TotalUserBalance;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.exceptions.ExistAccountException;
 import de.telran.mycryptowallet.repository.AccountRepository;
-import de.telran.mycryptowallet.service.interfaces.AccountService;
-import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
-import de.telran.mycryptowallet.service.interfaces.CurrencyService;
+import de.telran.mycryptowallet.service.interfaces.*;
 import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
 import de.telran.mycryptowallet.service.utils.PublicAddressGenerator;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -32,6 +34,9 @@ public class AccountServiceImpl implements AccountService {
     private final ActiveUserService activeUserService;
     private final AccountValidator accountValidator;
     private final PublicAddressGenerator publicAddressGenerator;
+    private final RateService rateService;
+    private final UserService userService;
+    private final int SCALE = 2;
 
     @Override
     public void addNewAccount(AccountAddDTO accountAddDTO) {
@@ -166,6 +171,47 @@ public class AccountServiceImpl implements AccountService {
         account.setBalance(account.getBalance().subtract(amount));
         account.setOrderBalance(amount);
         updateAccount(account.getId(), account);
+    }
+
+    @Override
+    @Transactional
+    public TotalUserBalance getTotalUserBalance(Long userId) {
+        List<Account> accounts = getAccountsByUser(userId);
+        TotalUserBalance totalUserBalance = new TotalUserBalance();
+        BigDecimal usdFrom = accounts.stream()
+                .filter(Objects::nonNull)
+                .filter(account -> !account.getCurrency().getCode().equals(currencyService.getBasicCurrency()))
+                .map(account -> account.getBalance().multiply(rateService.getFreshRate(account.getCurrency().getCode()).getValue()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal usdBase = accounts.stream()
+                .filter(Objects::nonNull)
+                .filter(account -> account.getCurrency().getCode().equals(currencyService.getBasicCurrency()))
+                .map(Account::getBalance)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal btcFrom = accounts.stream()
+                .filter(Objects::nonNull)
+                .filter(account -> !account.getCurrency().getCode().equals(currencyService.getBTCCurrency()) && !account.getCurrency().getCode().equals(currencyService.getBasicCurrency()))
+                .map(account -> account.getBalance().multiply(rateService.getFreshRate(account.getCurrency().getCode()).getValue()).divide(rateService.getFreshRate(currencyService.getBTCCurrency()).getValue(), SCALE, RoundingMode.HALF_UP))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal btcFromUSD = accounts.stream()
+                .filter(Objects::nonNull)
+                .filter(account -> account.getCurrency().getCode().equals(currencyService.getBasicCurrency()))
+                .map(account -> account.getBalance().divide(rateService.getFreshRate(currencyService.getBTCCurrency()).getValue(), SCALE, RoundingMode.HALF_UP))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal btcBase = accounts.stream()
+                .filter(Objects::nonNull)
+                .filter(account -> account.getCurrency().getCode().equals(currencyService.getBTCCurrency()))
+                .map(Account::getBalance)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        totalUserBalance.setUsd(usdBase.add(usdFrom));
+        totalUserBalance.setBtc(btcBase.add(btcFrom).add(btcFromUSD));
+        totalUserBalance.setUser(userService.getUserById(userId));
+
+
+        return totalUserBalance;
     }
 
 }

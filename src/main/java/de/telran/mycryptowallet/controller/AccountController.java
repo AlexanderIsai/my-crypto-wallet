@@ -2,6 +2,7 @@ package de.telran.mycryptowallet.controller;
 
 import de.telran.mycryptowallet.dto.AccountAddDTO;
 import de.telran.mycryptowallet.entity.Account;
+import de.telran.mycryptowallet.entity.TotalUserBalance;
 import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 import de.telran.mycryptowallet.service.interfaces.AccountService;
 import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
@@ -61,5 +62,10 @@ public class AccountController {
     @PutMapping(value = "/{id}")
     public void updateAccount(@PathVariable(name = "id") Long id, @RequestBody Account account) {
         accountService.updateAccount(id, account);
+    }
+
+    @GetMapping(value = "/total-balance")
+    public TotalUserBalance showTotalUserBalance(){
+        return accountService.getTotalUserBalance(activeUserService.getActiveUser().getId());
     }
 }

@@ -4,6 +4,7 @@ import de.telran.mycryptowallet.dto.AccountAddDTO;
 import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Order;
+import de.telran.mycryptowallet.entity.TotalUserBalance;
 import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
 import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 
@@ -18,7 +19,7 @@ import java.util.Optional;
  */
 public interface AccountService {
 
-    void addNewAccount(AccountAddDTO accountAddDTO) throws UserIsBlockedException;
+    void addNewAccount(AccountAddDTO accountAddDTO);
     List<Account> getAllAccounts();
     List<Account> getAccountsByUser(Long userId);
     List<Account> getAccountsByCurrency(String code);
@@ -32,10 +33,12 @@ public interface AccountService {
     List<Account> getAccountsBetweenAmount(BigDecimal from, BigDecimal to);
     Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code);
     void deposit(Long id, BigDecimal amount);
-    void withdraw(Long id, BigDecimal amount) throws NotEnoughFundsException;
-    void reserveForOrder(OrderAddDTO orderAddDTO) throws NotEnoughFundsException, UserIsBlockedException;
+    void withdraw(Long id, BigDecimal amount);
+    void reserveForOrder(OrderAddDTO orderAddDTO);
     Account getAccountFromOrder(Order order);
     void returnPartOrder(Account account, BigDecimal amount);
+
+    TotalUserBalance getTotalUserBalance(Long userId);
 
 
 

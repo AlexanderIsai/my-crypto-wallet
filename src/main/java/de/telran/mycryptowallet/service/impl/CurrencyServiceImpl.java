@@ -19,6 +19,7 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     private final CurrencyRepository currencyRepository;
     private final String BASIC_CURRENCY = "USDT";
+    private final String BTC = "BTC";
 
     @Override
     public void addCurrency(Currency currency) {
@@ -49,4 +50,10 @@ public class CurrencyServiceImpl implements CurrencyService {
     public String getBasicCurrency() {
         return BASIC_CURRENCY;
     }
+
+    @Override
+    public String getBTCCurrency() {
+        return BTC;
+    }
+
 }

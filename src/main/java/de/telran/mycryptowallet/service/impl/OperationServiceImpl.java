@@ -9,6 +9,7 @@ import de.telran.mycryptowallet.service.interfaces.*;
 import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 /**
@@ -48,8 +49,6 @@ public class OperationServiceImpl implements OperationService {
         operation.setType(operationAddDTO.getType());
 
         cashFlow(operation);
-
-        operationRepository.save(operation);
     }
 
     public void addOrderOperation(User orderOwner, User orderExecutor, Order order, BigDecimal amount) {
@@ -99,10 +98,11 @@ public class OperationServiceImpl implements OperationService {
                 sell(operation);
                 break;
         }
+        operationRepository.save(operation);
     }
 
     @Override
-    public void buy(Operation operation) throws NotEnoughFundsException {
+    public void buy(Operation operation) {
         Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
         Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
         accountService.withdraw(accountSell.getId(), operation.getAmount().multiply(operation.getRateValue()));
@@ -110,7 +110,7 @@ public class OperationServiceImpl implements OperationService {
     }
 
     @Override
-    public void sell(Operation operation) throws NotEnoughFundsException {
+    public void sell(Operation operation) {
         Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
         Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
         accountService.withdraw(accountSell.getId(), operation.getAmount());
@@ -126,4 +126,5 @@ public class OperationServiceImpl implements OperationService {
         receiver.setBalance(receiver.getBalance().add(amount));
         accountService.updateAccount(receiver.getId(), receiver);
     }
+
 }

@@ -18,4 +18,5 @@ public interface CurrencyService {
     Currency getCurrencyByCode(String code);
     Currency getCurrencyByTitle(String title);
     String getBasicCurrency();
+    String getBTCCurrency();
 }
