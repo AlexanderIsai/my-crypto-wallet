@@ -104,7 +104,8 @@ public class OperationServiceImpl implements OperationService {
     @Override
     public void buy(Operation operation) {
         Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
-        Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
+        //Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
+        Account accountBuy = operation.getAccount();
         accountService.withdraw(accountSell.getId(), operation.getAmount().multiply(operation.getRateValue()));
         accountService.deposit(accountBuy.getId(), operation.getAmount());
     }
@@ -112,10 +113,12 @@ public class OperationServiceImpl implements OperationService {
     @Override
     public void sell(Operation operation) {
         Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
-        Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
+        //Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
+        Account accountSell = operation.getAccount();
         accountService.withdraw(accountSell.getId(), operation.getAmount());
         accountService.deposit(accountBuy.getId(), operation.getAmount().multiply(operation.getRateValue()));
     }
+    //TODO clear comments
 
     @Override
     public void transfer(Long fromId, Long toId, BigDecimal amount) {

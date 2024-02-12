@@ -8,6 +8,7 @@ import de.telran.mycryptowallet.exceptions.NotActiveOrderException;
 import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
 import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -35,5 +36,8 @@ public interface OrderService {
 
     List<Order> getOrdersByStatusTypeCurrency(OrderStatus status, OperationType type, String code);
 
+    List<Order> getOrdersByStatusAndType(OrderStatus status, OperationType type);
+
+    BigDecimal getOrderAmount(Order order);
 
 }

@@ -1,4 +1,4 @@
-package de.telran.mycryptowallet.service.impl;
+package de.telran.mycryptowallet.service.utils;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Operation;
 import de.telran.mycryptowallet.entity.Rate;
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 

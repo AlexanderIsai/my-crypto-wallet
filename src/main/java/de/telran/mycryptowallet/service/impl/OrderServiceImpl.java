@@ -138,7 +138,7 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.CANCELLED);
         Account orderAccount = accountService.getAccountFromOrder(order);//аккаунт, где заморожены деньги
 
-        BigDecimal orderAmount = order.getAmount();
+        BigDecimal orderAmount = getOrderAmount(order);
         orderAccount.setOrderBalance(orderAccount.getOrderBalance().subtract(orderAmount));
         orderAccount.setBalance(orderAccount.getBalance().add(orderAmount));
         accountService.updateAccount(orderAccount.getId(), orderAccount);
@@ -154,5 +154,15 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> getOrdersByStatusTypeCurrency(OrderStatus status, OperationType type, String code) {
         Sort sort = type.equals(OperationType.BUY) ? Sort.by(Sort.Direction.DESC, "rateValue") : Sort.by(Sort.Direction.ASC, "rateValue");
         return orderRepository.findOrdersByStatusAndTypeAndCurrencyCode(status, type, code, sort);
+    }
+
+    @Override
+    public List<Order> getOrdersByStatusAndType(OrderStatus status, OperationType type) {
+        return orderRepository.findOrdersByStatusAndType(status, type);
+    }
+
+    @Override
+    public BigDecimal getOrderAmount(Order order) {
+        return order.getType().equals(OperationType.BUY) ? order.getAmount().multiply(order.getRateValue()) : order.getAmount();
     }
 }

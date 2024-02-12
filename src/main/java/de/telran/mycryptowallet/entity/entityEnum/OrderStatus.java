@@ -6,5 +6,5 @@ package de.telran.mycryptowallet.entity.entityEnum;
  * @author Alexander Isai on 18.01.2024.
  */
 public enum OrderStatus {
-    ACTIVE, CANCELLED, DONE
+    ACTIVE, CANCELLED, DONE, AUTO
 }
