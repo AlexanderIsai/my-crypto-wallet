@@ -26,10 +26,9 @@ public class OperationServiceImpl implements OperationService {
 
     @Override
     @Transactional
-    public void addExchangeOperation(User user, String code, BigDecimal amount, OperationType type) {
+    public Operation getExchangeOperation(User user, String code, BigDecimal amount, OperationType type) {
         accountValidator.isCorrectNumber(amount);
         Operation operation = new Operation();
-
         operation.setUser(user);
 
         Currency operationCurrency = currencyService.getCurrencyByCode(code);
@@ -45,41 +44,18 @@ public class OperationServiceImpl implements OperationService {
         operation.setAmount(amount);
 
         operation.setType(type);
-
-        cashFlow(operation);
+        return operation;
     }
-
-    public void addOrderOperation(User orderOwner, User orderExecutor, Order order, BigDecimal amount) {
-        Operation operationBuy = new Operation();
-        Operation operationSell = new Operation();
-
-        Account accountBuy = accountService.getAccountByUserIdAndCurrency(orderOwner.getId(), order.getCurrency().getCode()).orElseThrow();
-        Account accountSell = accountService.getAccountByUserIdAndCurrency(orderExecutor.getId(), order.getCurrency().getCode()).orElseThrow();
-
-        operationBuy.setUser(orderOwner);
-        operationSell.setUser(orderExecutor);
-
-        operationBuy.setAccount(accountBuy);
-        operationSell.setAccount(accountSell);
-
-        operationBuy.setCurrency(order.getCurrency());
-        operationSell.setCurrency(order.getCurrency());
-
-        operationBuy.setRateValue(order.getRateValue());
-        operationSell.setRateValue(order.getRateValue());
-
-        operationBuy.setAmount(amount);
-        operationSell.setAmount(amount);
-
-        operationBuy.setType(OperationType.BUY);
-        operationSell.setType(OperationType.SELL);
-
-        operationRepository.save(operationBuy);
-        operationRepository.save(operationSell);
-
-    }
-
+    @Transactional
     @Override
+    public void addOrderOperation(User orderOwner, User orderExecutor, Order order, BigDecimal amount) {
+        Operation buy = getExchangeOperation(orderOwner, order.getCurrency().getCode(), amount, OperationType.BUY);
+        Operation sell = getExchangeOperation(orderExecutor, order.getCurrency().getCode(), amount, OperationType.SELL);
+        operationRepository.save(buy);
+        operationRepository.save(sell);
+    }
+
+        @Override
     public void cashFlow(Operation operation) {
         switch (operation.getType()) {
             case DEPOSIT:
@@ -126,5 +102,4 @@ public class OperationServiceImpl implements OperationService {
         receiver.setBalance(receiver.getBalance().add(amount));
         accountService.updateAccount(receiver.getId(), receiver);
     }
-
 }

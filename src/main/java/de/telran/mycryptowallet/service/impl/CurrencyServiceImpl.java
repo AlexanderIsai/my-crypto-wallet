@@ -4,6 +4,7 @@ import de.telran.mycryptowallet.entity.Currency;
 import de.telran.mycryptowallet.repository.CurrencyRepository;
 import de.telran.mycryptowallet.service.interfaces.CurrencyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,8 +19,10 @@ import java.util.List;
 public class CurrencyServiceImpl implements CurrencyService {
 
     private final CurrencyRepository currencyRepository;
-    private final String BASIC_CURRENCY = "USDT";
-    private final String BTC = "BTC";
+    @Value("${app.basic.currency}")
+    private String BASIC_CURRENCY;
+    @Value("${app.btc.currency}")
+    private String BTC;
 
     @Override
     public void addCurrency(Currency currency) {
