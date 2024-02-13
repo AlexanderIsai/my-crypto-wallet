@@ -15,11 +15,13 @@ import java.math.BigDecimal;
  */
 public interface OperationService {
 
-    void addExchangeOperation(User user, String code, BigDecimal amount, OperationType type);
+    Operation getExchangeOperation(User user, String code, BigDecimal amount, OperationType type);
+
     void addOrderOperation(User orderOwner, User orderExecutor, Order order, BigDecimal amount);
     void cashFlow(Operation operation) throws NotEnoughFundsException;
     void buy(Operation operation) throws NotEnoughFundsException;
     void sell(Operation operation) throws NotEnoughFundsException;
     void transfer(Long fromId, Long toId, BigDecimal amount);
+    //TODO добавить админские методы (статистика и т.п.)
 
 }

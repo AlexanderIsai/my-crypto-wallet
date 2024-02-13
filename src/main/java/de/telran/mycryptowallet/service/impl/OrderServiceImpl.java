@@ -1,12 +1,8 @@
 package de.telran.mycryptowallet.service.impl;
 
-import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.*;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.entity.entityEnum.OrderStatus;
-import de.telran.mycryptowallet.exceptions.NotActiveOrderException;
-import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
-import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 import de.telran.mycryptowallet.repository.OrderRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
 import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
