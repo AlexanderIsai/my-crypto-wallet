@@ -3,6 +3,7 @@ package de.telran.mycryptowallet.controller;
 import de.telran.mycryptowallet.dto.OperationAddDTO;
 import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
 import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
+import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
 import de.telran.mycryptowallet.service.interfaces.OperationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class OperationController {
 
     private final OperationService operationService;
+    private final ActiveUserService activeUserService;
 
     @PostMapping(value = "/add")
     public void addOperation(@RequestBody OperationAddDTO operationAddDTO)  {
-        operationService.addExchangeOperation(operationAddDTO);
+        operationService.addExchangeOperation(activeUserService.getActiveUser(), operationAddDTO.getCurrencyCode(), operationAddDTO.getAmount(), operationAddDTO.getType());
     }
 
 }

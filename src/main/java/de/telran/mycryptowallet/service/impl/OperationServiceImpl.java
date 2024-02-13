@@ -1,15 +1,11 @@
 package de.telran.mycryptowallet.service.impl;
-import de.telran.mycryptowallet.dto.OperationAddDTO;
 import de.telran.mycryptowallet.entity.*;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
-import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
-import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 import de.telran.mycryptowallet.repository.OperationRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
 import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 /**
@@ -17,36 +13,38 @@ import java.math.BigDecimal;
  *
  * @author Alexander Isai on 24.01.2024.
  */
-@Service
 @RequiredArgsConstructor
+@Service
 public class OperationServiceImpl implements OperationService {
 
     private final OperationRepository operationRepository;
-    private final ActiveUserService activeUserService;
     private final AccountService accountService;
     private final CurrencyService currencyService;
     private final RateService rateService;
     private final AccountValidator accountValidator;
+    private final AccountBusinessService accountBusinessService;
+
     @Override
     @Transactional
-    public void addExchangeOperation(OperationAddDTO operationAddDTO) {
+    public void addExchangeOperation(User user, String code, BigDecimal amount, OperationType type) {
+        accountValidator.isCorrectNumber(amount);
         Operation operation = new Operation();
 
-        User operationUser = activeUserService.getActiveUser();
-        operation.setUser(operationUser);
+        operation.setUser(user);
 
-        Currency operationCurrency = currencyService.getCurrencyByCode(operationAddDTO.getCurrencyCode());
+        Currency operationCurrency = currencyService.getCurrencyByCode(code);
         operation.setCurrency(operationCurrency);
 
-        Account operationAccount = accountService.getAccountByUserIdAndCurrency(operationUser.getId(), operationCurrency.getCode()).orElseThrow();
+        Account operationAccount = accountService.getAccountByUserIdAndCurrency(user.getId(), operationCurrency.getCode()).orElseThrow();
+        accountValidator.isExistUserAccount(operationAccount);
         operation.setAccount(operationAccount);
 
-        Rate operationRate = rateService.getFreshRate(operationAddDTO.getCurrencyCode());
+        Rate operationRate = rateService.getFreshRate(code);
         operation.setRateValue(operationRate.getValue());
 
-        operation.setAmount(operationAddDTO.getAmount());
+        operation.setAmount(amount);
 
-        operation.setType(operationAddDTO.getType());
+        operation.setType(type);
 
         cashFlow(operation);
     }
@@ -57,7 +55,6 @@ public class OperationServiceImpl implements OperationService {
 
         Account accountBuy = accountService.getAccountByUserIdAndCurrency(orderOwner.getId(), order.getCurrency().getCode()).orElseThrow();
         Account accountSell = accountService.getAccountByUserIdAndCurrency(orderExecutor.getId(), order.getCurrency().getCode()).orElseThrow();
-
 
         operationBuy.setUser(orderOwner);
         operationSell.setUser(orderExecutor);
@@ -86,10 +83,10 @@ public class OperationServiceImpl implements OperationService {
     public void cashFlow(Operation operation) {
         switch (operation.getType()) {
             case DEPOSIT:
-                accountService.deposit(operation.getAccount().getId(), operation.getAmount());
+                accountBusinessService.deposit(operation.getAccount(), operation.getAmount());
                 break;
             case WITHDRAW:
-                    accountService.withdraw(operation.getAccount().getId(), operation.getAmount());
+                    accountBusinessService.withdraw(operation.getAccount(), operation.getAmount());
                 break;
             case BUY:
                 buy(operation);
@@ -106,8 +103,8 @@ public class OperationServiceImpl implements OperationService {
         Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
         //Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
         Account accountBuy = operation.getAccount();
-        accountService.withdraw(accountSell.getId(), operation.getAmount().multiply(operation.getRateValue()));
-        accountService.deposit(accountBuy.getId(), operation.getAmount());
+        accountBusinessService.withdraw(accountSell, operation.getAmount().multiply(operation.getRateValue()));
+        accountBusinessService.deposit(accountBuy, operation.getAmount());
     }
 
     @Override
@@ -115,8 +112,8 @@ public class OperationServiceImpl implements OperationService {
         Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
         //Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
         Account accountSell = operation.getAccount();
-        accountService.withdraw(accountSell.getId(), operation.getAmount());
-        accountService.deposit(accountBuy.getId(), operation.getAmount().multiply(operation.getRateValue()));
+        accountBusinessService.withdraw(accountSell, operation.getAmount());
+        accountBusinessService.deposit(accountBuy, operation.getAmount().multiply(operation.getRateValue()));
     }
     //TODO clear comments
 

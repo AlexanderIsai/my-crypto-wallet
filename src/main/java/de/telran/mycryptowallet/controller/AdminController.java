@@ -57,5 +57,10 @@ public class AdminController {
         return orderService.getUsersOrders(userId);
     }
 
+    @GetMapping(value = "/accounts-currency")
+    public List<Account> showAccountsByCurrency(@RequestParam(name = "code") String code) {
+        return accountService.getAccountsByCurrency(code);
+    }
+
 
 }

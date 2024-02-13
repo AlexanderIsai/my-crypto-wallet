@@ -1,9 +1,6 @@
 package de.telran.mycryptowallet.controller;
 
-import de.telran.mycryptowallet.exceptions.ExistAccountException;
-import de.telran.mycryptowallet.exceptions.NotActiveOrderException;
-import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
-import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
+import de.telran.mycryptowallet.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -39,8 +36,16 @@ public class ExceptionController {
 
     @ExceptionHandler(ExistAccountException.class)
     public ResponseEntity<String> handleExistAccount(ExistAccountException exception){
-        log.error("etwas geht schleht", exception);
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 
+    @ExceptionHandler(IncorrectInputException.class)
+    public ResponseEntity<String> handleIncorrectInput(IncorrectInputException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFound(UserNotFoundException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

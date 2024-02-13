@@ -22,6 +22,7 @@ public class ActiveUserServiceImpl implements ActiveUserService {
     @Override
     public User getActiveUser() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        userValidator.isUserNotFound(user);
         userValidator.isUserBlock(user.getStatus());
         return user;
     }

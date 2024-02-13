@@ -2,6 +2,7 @@ package de.telran.mycryptowallet.service.interfaces;
 
 import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.Order;
+import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.entity.entityEnum.OrderStatus;
 import de.telran.mycryptowallet.exceptions.NotActiveOrderException;
@@ -18,7 +19,7 @@ import java.util.List;
  */
 public interface OrderService {
 
-    void addOrder(OrderAddDTO orderDTO);
+    void addOrder(User user, String code, OperationType type, BigDecimal amount, BigDecimal rate);
 
     List<Order> getAllOrders();
 

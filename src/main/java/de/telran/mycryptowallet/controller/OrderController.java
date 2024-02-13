@@ -32,7 +32,9 @@ public class OrderController {
 
     @PostMapping(value = "/add")
     public void addNewOrder(@RequestBody OrderAddDTO orderAddDTO) {
-        orderService.addOrder(orderAddDTO);
+
+        orderService.addOrder(activeUserService.getActiveUser(), orderAddDTO.getCurrencyCode(), orderAddDTO.getOperationType(),
+                orderAddDTO.getAmount(), orderAddDTO.getOrderRate());
     }
 
     @GetMapping(value = "/all-orders")

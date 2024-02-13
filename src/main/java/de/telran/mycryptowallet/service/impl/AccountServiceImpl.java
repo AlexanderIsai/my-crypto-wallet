@@ -11,6 +11,7 @@ import de.telran.mycryptowallet.repository.AccountRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
 import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
 import de.telran.mycryptowallet.service.utils.PublicAddressGenerator;
+import de.telran.mycryptowallet.service.utils.validators.UserValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,20 +34,19 @@ public class AccountServiceImpl implements AccountService {
     private final CurrencyService currencyService;
     private final ActiveUserService activeUserService;
     private final AccountValidator accountValidator;
+    private final UserValidator userValidator;
     private final PublicAddressGenerator publicAddressGenerator;
     private final RateService rateService;
     private final UserService userService;
     private final int SCALE = 2;
 
     @Override
-    public void addNewAccount(AccountAddDTO accountAddDTO) {
-            if(existsAccountByUserIdAndCurrency(activeUserService.getActiveUser().getId(), accountAddDTO.getCurrencyCode())){
-                throw new ExistAccountException("Account in this currency already exists for the user");
-            }
+    public void addNewAccount(String code) {
+        //accountValidator.isNotExistUserAccount(getAccountByUserIdAndCurrency(activeUserService.getActiveUser().getId(), code).orElseThrow());
             Account account = new Account();
             account.setUser(activeUserService.getActiveUser());
-            account.setPublicAddress(publicAddressGenerator.generatePublicAddress(accountAddDTO.getCurrencyCode()));
-            account.setCurrency(currencyService.getCurrencyByCode(accountAddDTO.getCurrencyCode()));
+            account.setPublicAddress(publicAddressGenerator.generatePublicAddress(code));
+            account.setCurrency(currencyService.getCurrencyByCode(code));
             account.setBalance(BigDecimal.ZERO);
             account.setOrderBalance(BigDecimal.ZERO);
             accountRepository.save(account);
@@ -59,6 +59,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<Account> getAccountsByUser(Long userId) {
+        userValidator.isUserNotFound(userService.getUserById(userId));
         return accountRepository.findAccountsByUserId(userId);
     }
 
@@ -109,109 +110,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code) {
+        userValidator.isUserNotFound(userService.getUserById(userId));
         return accountRepository.findAccountByUserIdAndCurrencyCode(userId, code);
     }
-
-    @Override
-    public void deposit(Long id, BigDecimal amount) {
-        Account account = accountRepository.findAccountById(id);
-        account.setBalance(account.getBalance().add(amount));
-        updateAccount(id, account);
-    }
-
-    @Override
-    public void withdraw(Long id, BigDecimal amount) {
-        Account account = accountRepository.findAccountById(id);
-        accountValidator.isEnoughMoney(account, amount);
-        account.setBalance(account.getBalance().subtract(amount));
-        updateAccount(id, account);
-    }
-
-    @Override
-    public void reserveForOrder(OrderAddDTO orderAddDTO) {
-        User user = activeUserService.getActiveUser();
-        try {
-            if (!existsAccountByUserIdAndCurrency(user.getId(), orderAddDTO.getCurrencyCode())) {
-                throw new ExistAccountException("Account does not exist");
-            }
-            switch (orderAddDTO.getOperationType()) {
-                case BUY:
-                    Account accountBuy = accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), currencyService.getBasicCurrency()).orElseThrow();
-                    accountValidator.isEnoughMoney(accountBuy, orderAddDTO.getAmount().multiply(orderAddDTO.getOrderRate()));
-                        accountBuy.setOrderBalance(accountBuy.getOrderBalance().add(orderAddDTO.getAmount().multiply(orderAddDTO.getOrderRate())));
-                        accountBuy.setBalance(accountBuy.getBalance().subtract(orderAddDTO.getAmount().multiply(orderAddDTO.getOrderRate())));
-                        updateAccount(accountBuy.getId(), accountBuy);
-                    break;
-                case SELL:
-                    Account accountSell = accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), orderAddDTO.getCurrencyCode()).orElseThrow();
-                    accountValidator.isEnoughMoney(accountSell, orderAddDTO.getAmount());
-                    accountSell.setOrderBalance(accountSell.getOrderBalance().add(orderAddDTO.getAmount()));
-                    accountSell.setBalance(accountSell.getBalance().subtract(orderAddDTO.getAmount()));
-                    updateAccount(accountSell.getId(), accountSell);
-                    break;
-            }
-        }
-        catch (ExistAccountException exception){
-            throw new RuntimeException(exception.getMessage(), exception);
-        }
-    }
-
-    @Override
-    public Account getAccountFromOrder(Order order) {
-        if(order.getType().equals(OperationType.BUY)){
-            return accountRepository.findAccountByUserIdAndCurrencyCode(order.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
-        }
-        else {
-            return accountRepository.findAccountByUserIdAndCurrencyCode(order.getUser().getId(), order.getCurrency().getCode()).orElseThrow();
-        }
-
-    }
-    @Override
-    public void returnPartOrder(Account account, BigDecimal amount) {
-        account.setBalance(account.getBalance().subtract(amount));
-        account.setOrderBalance(amount);
-        updateAccount(account.getId(), account);
-    }
-
-    @Override
-    @Transactional
-    public TotalUserBalance getTotalUserBalance(Long userId) {
-        List<Account> accounts = getAccountsByUser(userId);
-        TotalUserBalance totalUserBalance = new TotalUserBalance();
-        BigDecimal usdFrom = accounts.stream()
-                .filter(Objects::nonNull)
-                .filter(account -> !account.getCurrency().getCode().equals(currencyService.getBasicCurrency()))
-                .map(account -> account.getBalance().multiply(rateService.getFreshRate(account.getCurrency().getCode()).getValue()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal usdBase = accounts.stream()
-                .filter(Objects::nonNull)
-                .filter(account -> account.getCurrency().getCode().equals(currencyService.getBasicCurrency()))
-                .map(Account::getBalance)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal btcFrom = accounts.stream()
-                .filter(Objects::nonNull)
-                .filter(account -> !account.getCurrency().getCode().equals(currencyService.getBTCCurrency()) && !account.getCurrency().getCode().equals(currencyService.getBasicCurrency()))
-                .map(account -> account.getBalance().multiply(rateService.getFreshRate(account.getCurrency().getCode()).getValue()).divide(rateService.getFreshRate(currencyService.getBTCCurrency()).getValue(), SCALE, RoundingMode.HALF_UP))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal btcFromUSD = accounts.stream()
-                .filter(Objects::nonNull)
-                .filter(account -> account.getCurrency().getCode().equals(currencyService.getBasicCurrency()))
-                .map(account -> account.getBalance().divide(rateService.getFreshRate(currencyService.getBTCCurrency()).getValue(), SCALE, RoundingMode.HALF_UP))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal btcBase = accounts.stream()
-                .filter(Objects::nonNull)
-                .filter(account -> account.getCurrency().getCode().equals(currencyService.getBTCCurrency()))
-                .map(Account::getBalance)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        totalUserBalance.setUsd(usdBase.add(usdFrom));
-        totalUserBalance.setBtc(btcBase.add(btcFrom).add(btcFromUSD));
-        totalUserBalance.setUser(userService.getUserById(userId));
-
-
-        return totalUserBalance;
-    }
-
 }

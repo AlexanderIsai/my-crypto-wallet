@@ -17,6 +17,5 @@ public class OrderAddDTO {
     private String currencyCode;
     private OperationType operationType;
     private BigDecimal amount;
-    private OrderStatus orderStatus;
     private BigDecimal orderRate;
 }

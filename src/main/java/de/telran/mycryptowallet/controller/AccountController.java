@@ -4,6 +4,7 @@ import de.telran.mycryptowallet.dto.AccountAddDTO;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.TotalUserBalance;
 import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
+import de.telran.mycryptowallet.service.interfaces.AccountBusinessService;
 import de.telran.mycryptowallet.service.interfaces.AccountService;
 import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
 import lombok.RequiredArgsConstructor;
@@ -27,16 +28,13 @@ public class AccountController {
 
     private final AccountService accountService;
     private final ActiveUserService activeUserService;
+    private final AccountBusinessService accountBusinessService;
 
 
     @PostMapping(value = "/add")
     public void addNewAccount(@RequestBody AccountAddDTO accountAddDTO) {
-        accountService.addNewAccount(accountAddDTO);
-    }
 
-    @GetMapping(value = "/code")
-    public List<Account> showAccountsByCurrency(@RequestParam(name = "code") String code) {
-        return accountService.getAccountsByCurrency(code);
+        accountService.addNewAccount(accountAddDTO.getCurrencyCode());
     }
 
     @GetMapping(value = "/my")
@@ -66,6 +64,6 @@ public class AccountController {
 
     @GetMapping(value = "/total-balance")
     public TotalUserBalance showTotalUserBalance(){
-        return accountService.getTotalUserBalance(activeUserService.getActiveUser().getId());
+        return accountBusinessService.getTotalUserBalance(activeUserService.getActiveUser().getId());
     }
 }

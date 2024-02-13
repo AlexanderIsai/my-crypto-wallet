@@ -10,5 +10,5 @@ import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
  */
 public interface ActiveUserService {
 
-    User getActiveUser() throws UserIsBlockedException;
+    User getActiveUser();
 }

@@ -1,13 +1,9 @@
 package de.telran.mycryptowallet.service.interfaces;
-
-import de.telran.mycryptowallet.dto.AccountAddDTO;
-import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.TotalUserBalance;
-import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
-import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
-
+import de.telran.mycryptowallet.entity.User;
+import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +15,7 @@ import java.util.Optional;
  */
 public interface AccountService {
 
-    void addNewAccount(AccountAddDTO accountAddDTO);
+    void addNewAccount(String code);
     List<Account> getAllAccounts();
     List<Account> getAccountsByUser(Long userId);
     List<Account> getAccountsByCurrency(String code);
@@ -32,14 +28,4 @@ public interface AccountService {
     void updateAccount(Long id, Account account);
     List<Account> getAccountsBetweenAmount(BigDecimal from, BigDecimal to);
     Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code);
-    void deposit(Long id, BigDecimal amount);
-    void withdraw(Long id, BigDecimal amount);
-    void reserveForOrder(OrderAddDTO orderAddDTO);
-    Account getAccountFromOrder(Order order);
-    void returnPartOrder(Account account, BigDecimal amount);
-
-    TotalUserBalance getTotalUserBalance(Long userId);
-
-
-
 }

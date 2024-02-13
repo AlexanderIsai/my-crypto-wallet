@@ -9,6 +9,7 @@ import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
 import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 import de.telran.mycryptowallet.repository.OrderRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
+import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
 import de.telran.mycryptowallet.service.utils.validators.OrderValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -35,27 +36,28 @@ public class OrderServiceImpl implements OrderService {
     private final UserService userService;
     private final OperationService operationService;
     private final OrderValidator orderValidator;
-    private final int SCALE = 2;
+    private final AccountValidator accountValidator;
+    private final AccountBusinessService accountBusinessService;
+    private final static int SCALE = 2;
 
     @Override
     @Transactional
-    public void addOrder(OrderAddDTO orderDTO) {
+    public void addOrder(User user, String code, OperationType type, BigDecimal amount, BigDecimal rate) {
         Order order = new Order();
 
-        User orderUser = activeUserService.getActiveUser();
-        order.setUser(orderUser);
+        order.setUser(user);
 
-        Currency orderCurrency = currencyService.getCurrencyByCode(orderDTO.getCurrencyCode());
+        Currency orderCurrency = currencyService.getCurrencyByCode(code);
         order.setCurrency(orderCurrency);
 
-        order.setRateValue(orderDTO.getOrderRate());
+        order.setRateValue(rate);
+        accountValidator.isCorrectNumber(amount);
+        order.setAmount(amount);
 
-        order.setAmount(orderDTO.getAmount());
-
-        order.setType(orderDTO.getOperationType());
+        order.setType(type);
         order.setStatus(OrderStatus.ACTIVE);
 
-        accountService.reserveForOrder(orderDTO);
+        accountBusinessService.reserveForOrder(user, code, type, amount, rate);
         orderRepository.save(order);
     }
 
@@ -111,8 +113,9 @@ public class OrderServiceImpl implements OrderService {
             operationService.transfer(ownerBasicAccount.getId(), executerBasicAccount.getId(), transferAmount.multiply(order.getRateValue()));// с долларового счета владельца ордера переводим бабло на долларовый счет исполнителя ордера
             operationService.transfer(executerOrderAccount.getId(), ownerOrderAccount.getId(), transferAmount);
             operationService.addOrderOperation(ownerOrder, executorOrder, order, transferAmount);
-            accountService.returnPartOrder(ownerOrderAccount, order.getAmount());
-
+            if(order.getStatus().equals(OrderStatus.ACTIVE)) {
+                accountBusinessService.returnPartOrder(ownerOrderAccount, order.getAmount());
+            }
         }
         else {
             if(executerBasicAccount.getBalance().compareTo(order.getAmount().multiply(order.getRateValue())) >= 0) {
@@ -124,11 +127,13 @@ public class OrderServiceImpl implements OrderService {
                 order.setStatus(OrderStatus.ACTIVE);
                 order.setAmount(order.getAmount().subtract(transferAmount));
             }
-            operationService.transfer(executerBasicAccount.getId(), ownerBasicAccount.getId(), transferAmount.multiply(order.getRateValue()));// с долларового счета владельца ордера переводим бабло на долларовый счет исполнителя ордера
+            operationService.transfer(executerBasicAccount.getId(), ownerBasicAccount.getId(), transferAmount.multiply(order.getRateValue()));// с долларового счета исполнителя ордера переводим бабло на долларовый счет владельца ордера
             operationService.transfer(ownerOrderAccount.getId(), executerOrderAccount.getId(), transferAmount);
             operationService.addOrderOperation(executorOrder, ownerOrder, order, transferAmount);
-            accountService.returnPartOrder(ownerOrderAccount, order.getAmount());
 
+            if(order.getStatus().equals(OrderStatus.ACTIVE)) {
+                accountBusinessService.returnPartOrder(ownerOrderAccount, order.getAmount()); // переведи остаток на счет
+            }
         }
         orderRepository.save(order);
     }
@@ -136,7 +141,7 @@ public class OrderServiceImpl implements OrderService {
     public void cancelOrder(Long orderId) {
         Order order = orderRepository.findOrderById(orderId);
         order.setStatus(OrderStatus.CANCELLED);
-        Account orderAccount = accountService.getAccountFromOrder(order);//аккаунт, где заморожены деньги
+        Account orderAccount = accountBusinessService.getAccountFromOrder(order);//аккаунт, где заморожены деньги
 
         BigDecimal orderAmount = getOrderAmount(order);
         orderAccount.setOrderBalance(orderAccount.getOrderBalance().subtract(orderAmount));

@@ -28,6 +28,7 @@ public class TestBotService {
     private final OperationService operationService;
     private final RateService rateService;
     private final TotalUserBalanceService totalUserBalanceService;
+    private final AccountBusinessService accountBusinessService;
     private User MORNING_BUYER;
     private User EVENING_BUYER;
     private final int SCALE = 2;
@@ -45,7 +46,6 @@ public class TestBotService {
     }
     @Scheduled(cron = "0 0 20 * * *")
     public void eveningSell(){
-
         sell(MORNING_BUYER);
     }
 
@@ -70,7 +70,7 @@ public class TestBotService {
         operationBuy.setAmount(accountUSDBuyer.getBalance().divide(operationRate.getValue(), SCALE, RoundingMode.HALF_DOWN).subtract(BigDecimal.valueOf(0.01)));
         operationBuy.setType(OperationType.BUY);
         operationService.cashFlow(operationBuy);
-        totalUserBalanceService.add(accountService.getTotalUserBalance(user.getId()));
+        totalUserBalanceService.add(accountBusinessService.getTotalUserBalance(user.getId()));
     }
 
     public void sell(User user){
@@ -84,6 +84,6 @@ public class TestBotService {
         operationSell.setAmount(accountBTCSeller.getBalance());
         operationSell.setType(OperationType.SELL);
         operationService.cashFlow(operationSell);
-        totalUserBalanceService.add(accountService.getTotalUserBalance(user.getId()));
+        totalUserBalanceService.add(accountBusinessService.getTotalUserBalance(user.getId()));
     }
 }

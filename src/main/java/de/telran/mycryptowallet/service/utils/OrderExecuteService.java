@@ -31,8 +31,7 @@ public class OrderExecuteService {
     private final RateService rateService;
     private final AccountService accountService;
     private final OperationService operationService;
-    @PersistenceContext
-    private EntityManager entityManager;
+
 
 
     @Scheduled(cron = "0 */6 * * * *")
