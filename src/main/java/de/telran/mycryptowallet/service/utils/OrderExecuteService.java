@@ -38,7 +38,7 @@ public class OrderExecuteService {
     public void executeBuyOrders(){
         List<Order> ordersBuy = orderService.getOrdersByStatusAndType(OrderStatus.ACTIVE, OperationType.BUY);
         for (Order order : ordersBuy) {
-            if (order.getRateValue().compareTo(rateService.getFreshRate(order.getCurrency().getCode()).getValue()) >= 0){
+            if (order.getRateValue().compareTo(rateService.getFreshRate(order.getCurrency().getCode()).getSellRate()) >= 0){
                 Operation operation = new Operation();
 
                 User user = order.getUser();
@@ -50,7 +50,7 @@ public class OrderExecuteService {
                 operation.setAccount(account);
 
                 Rate rate = rateService.getFreshRate(order.getCurrency().getCode());
-                operation.setRateValue(rate.getValue());
+                operation.setRateValue(rate.getSellRate());
 
                 operation.setAmount(order.getAmount());
 
@@ -67,7 +67,7 @@ public class OrderExecuteService {
     public void executeSellOrders(){
         List<Order> ordersSell = orderService.getOrdersByStatusAndType(OrderStatus.ACTIVE, OperationType.SELL);
         for (Order order : ordersSell) {
-            if (order.getRateValue().compareTo(rateService.getFreshRate(order.getCurrency().getCode()).getValue()) <= 0){
+            if (order.getRateValue().compareTo(rateService.getFreshRate(order.getCurrency().getCode()).getBuyRate()) <= 0){
                 Operation operation = new Operation();
 
                 User user = order.getUser();
@@ -79,7 +79,7 @@ public class OrderExecuteService {
                 operation.setAccount(account);
 
                 Rate rate = rateService.getFreshRate(order.getCurrency().getCode());
-                operation.setRateValue(rate.getValue());
+                operation.setRateValue(rate.getBuyRate());
 
                 operation.setAmount(order.getAmount());
 
