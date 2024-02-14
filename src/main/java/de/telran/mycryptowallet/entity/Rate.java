@@ -31,6 +31,12 @@ public class Rate {
     @Column(name = "rate_value")
     private BigDecimal value;
 
+    @Column(name = "buy_rate")
+    private BigDecimal buyRate;
+
+    @Column(name = "sell_rate")
+    private BigDecimal sellRate;
+
     @ManyToOne
     @JoinColumn(name = "currency", referencedColumnName = "code")
     private Currency currency;

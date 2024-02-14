@@ -66,7 +66,7 @@ class AccountServiceImplTest {
         when(currencyService.getCurrencyByCode(currencyCode)).thenReturn(currency);
         when(publicAddressGenerator.generatePublicAddress(currencyCode)).thenReturn(generatedAddress);
 
-        accountService.addNewAccount(currencyCode);
+        accountService.addNewAccount(activeUser, currencyCode);
 
         ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
         verify(accountRepository).save(accountCaptor.capture());

@@ -22,4 +22,6 @@ public interface AccountBusinessService {
     Account getAccountFromOrder(Order order);
     void returnPartOrder(Account account, BigDecimal amount);
     TotalUserBalance getTotalUserBalance(Long userId);
+    TotalUserBalance getTotalBalance();
+    TotalUserBalance showProfit();
 }

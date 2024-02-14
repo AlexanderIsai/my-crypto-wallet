@@ -2,10 +2,9 @@ package de.telran.mycryptowallet.controller;
 
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Order;
+import de.telran.mycryptowallet.entity.TotalUserBalance;
 import de.telran.mycryptowallet.entity.User;
-import de.telran.mycryptowallet.service.interfaces.AccountService;
-import de.telran.mycryptowallet.service.interfaces.OrderService;
-import de.telran.mycryptowallet.service.interfaces.UserService;
+import de.telran.mycryptowallet.service.interfaces.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +24,7 @@ public class AdminController {
 
     private final UserService userService;
     private final AccountService accountService;
+    private final AccountBusinessService accountBusinessService;
     private final OrderService orderService;
 
     @GetMapping(value = "/show-all-users")
@@ -62,5 +62,14 @@ public class AdminController {
         return accountService.getAccountsByCurrency(code);
     }
 
+    @GetMapping(value = "/show-total-balance")
+    public TotalUserBalance showAllBalances(){
+        return accountBusinessService.getTotalBalance();
+    }
+
+    @GetMapping(value = "/profit")
+    public TotalUserBalance showProfit(){
+        return accountBusinessService.showProfit();
+    }
 
 }

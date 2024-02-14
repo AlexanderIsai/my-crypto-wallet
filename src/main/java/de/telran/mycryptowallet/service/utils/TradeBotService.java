@@ -21,7 +21,7 @@ import java.math.RoundingMode;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class TestBotService {
+public class TradeBotService {
     private final UserService userService;
     private final CurrencyService currencyService;
     private final AccountService accountService;
