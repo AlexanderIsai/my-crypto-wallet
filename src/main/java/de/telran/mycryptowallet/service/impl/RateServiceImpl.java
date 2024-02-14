@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 
 /**
@@ -26,7 +27,9 @@ public class RateServiceImpl implements RateService {
     private final CurrencyService currencyService;
     private final RateRepository rateRepository;
     private final RateGenerator rateGenerator;
-    private final BigDecimal BASIC_RATE = BigDecimal.valueOf(1.00);
+    private final static BigDecimal BASIC_RATE = BigDecimal.valueOf(1.00);
+    private final static BigDecimal MARGIN = BigDecimal.valueOf(5.00);
+    private final static int SCALE = 2;
     @Override
     public Map<String, Object> getRate() {
         return rateGenerator.getBitcoinPrice();
@@ -40,6 +43,8 @@ public class RateServiceImpl implements RateService {
         Map<String, Object> priceUsd = (Map<String, Object>) getRate().get(currencyTitle);
         rate.setCurrency(currencyService.getCurrencyByTitle(currencyTitle));
         rate.setValue(BigDecimal.valueOf((Integer) priceUsd.get(priceUsd.keySet().iterator().next())));
+        rate.setSellRate(rate.getValue().add(rate.getValue().multiply(MARGIN).divide(BigDecimal.valueOf(100),SCALE, RoundingMode.HALF_DOWN )));
+        rate.setBuyRate(rate.getValue().subtract(rate.getValue().multiply(MARGIN).divide(BigDecimal.valueOf(100), SCALE, RoundingMode.HALF_DOWN)));
         rateRepository.save(rate);
     }
 
@@ -49,6 +54,8 @@ public class RateServiceImpl implements RateService {
         if (code.equals(currencyService.getBasicCurrency())){
             rate.setCurrency(currencyService.getCurrencyByCode(currencyService.getBasicCurrency()));
             rate.setValue(BASIC_RATE);
+            rate.setBuyRate(BASIC_RATE);
+            rate.setSellRate(BASIC_RATE);
         }
         else {
             rate = rateRepository.getFreshRate(code);

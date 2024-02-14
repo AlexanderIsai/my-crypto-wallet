@@ -82,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
 
     private BigDecimal calculateTransferAmount(Order order, Account executorOrderAccount, Account executorBasicAccount) {
         BigDecimal availableBalance = order.getType().equals(OperationType.BUY) ? executorOrderAccount.getBalance() : executorBasicAccount.getBalance().divide(order.getRateValue(), SCALE, RoundingMode.HALF_DOWN).subtract(BigDecimal.valueOf(BALANCE_SAFETY));
-        BigDecimal requiredAmount = order.getType().equals(OperationType.BUY) ? order.getAmount().multiply(order.getRateValue()) : order.getAmount();
+        BigDecimal requiredAmount = order.getAmount();
         if (availableBalance.compareTo(requiredAmount) >= 0) {
             order.setStatus(OrderStatus.DONE);
             return order.getAmount();

@@ -1,6 +1,7 @@
 package de.telran.mycryptowallet.controller;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
+import de.telran.mycryptowallet.service.interfaces.AccountService;
 import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
 import de.telran.mycryptowallet.service.interfaces.UserService;
 import jakarta.validation.Valid;
@@ -22,10 +23,12 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final ActiveUserService activeUserService;
+    private final AccountService accountService;
 
     @PostMapping(value = "/add-new-user")
     public void save(@RequestBody @Valid User user) {
         userService.addNewUser(user);
+        accountService.createUserAccounts(user);
     }
 
     @GetMapping(value = "/{id}")

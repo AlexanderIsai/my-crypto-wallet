@@ -34,7 +34,7 @@ public class AccountController {
     @PostMapping(value = "/add")
     public void addNewAccount(@RequestBody AccountAddDTO accountAddDTO) {
 
-        accountService.addNewAccount(accountAddDTO.getCurrencyCode());
+        accountService.addNewAccount(activeUserService.getActiveUser(), accountAddDTO.getCurrencyCode());
     }
 
     @GetMapping(value = "/my")

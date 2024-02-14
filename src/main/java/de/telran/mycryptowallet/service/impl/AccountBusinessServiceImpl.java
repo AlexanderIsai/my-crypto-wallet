@@ -5,6 +5,7 @@ import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.TotalUserBalance;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
+import de.telran.mycryptowallet.entity.entityEnum.UserRole;
 import de.telran.mycryptowallet.repository.AccountRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
 import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * description
@@ -31,6 +33,7 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
     private final CurrencyService currencyService;
     private final UserService userService;
     private final RateService rateService;
+    private final AccountManagerService accountManagerService;
     private final static int SCALE = 2;
 
     @Transactional
@@ -39,6 +42,7 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
         accountValidator.isCorrectNumber(amount);
         account.setBalance(account.getBalance().add(amount));
         accountService.updateAccount(account.getId(), account);
+        accountManagerService.depositManager(account.getCurrency().getCode(), amount);
     }
 
     @Transactional
@@ -48,6 +52,7 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
         accountValidator.isEnoughMoney(account, amount);
         account.setBalance(account.getBalance().subtract(amount));
         accountService.updateAccount(account.getId(), account);
+        accountManagerService.withdrawManager(account.getCurrency().getCode(), amount);
     }
 
     @Transactional
@@ -112,6 +117,31 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
         return totalUserBalance;
     }
 
+    @Transactional
+    @Override
+    public TotalUserBalance getTotalBalance() {
+        TotalUserBalance sumOfBalances = new TotalUserBalance();
+        List<User> users = userService.getAllUsers();
+
+        BigDecimal usd = users.stream()
+                .filter(Objects::nonNull)
+                .filter(user -> !user.getRole().equals(UserRole.ROLE_ADMIN))
+                .map(user -> getTotalUserBalance(user.getId()))
+                .map(TotalUserBalance::getUsd)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal btc = users.stream()
+                .filter(Objects::nonNull)
+                .filter(user -> !user.getRole().equals(UserRole.ROLE_ADMIN))
+                .map(user -> getTotalUserBalance(user.getId()))
+                .map(TotalUserBalance::getBtc)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        sumOfBalances.setUsd(usd);
+        sumOfBalances.setBtc(btc);
+        return sumOfBalances;
+    }
+
     private BigDecimal getUsdBalanceFromCryptoAccounts(List<Account> accounts){
         BigDecimal usdFrom = accounts.stream()
                 .filter(Objects::nonNull)
@@ -132,5 +162,17 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
 
     private BigDecimal getBTCBalanceFromUSDAccount(Account account){
         return account.getBalance().divide(rateService.getFreshRate(currencyService.getBTCCurrency()).getValue(), SCALE, RoundingMode.HALF_DOWN);
+    }
+
+    @Transactional
+    @Override
+    public TotalUserBalance showProfit() {
+        User manager = userService.getUserByEmail("manager@ukr.net").orElseThrow();
+        TotalUserBalance profit = new TotalUserBalance();
+        BigDecimal usd = getTotalUserBalance(manager.getId()).getUsd().subtract(getTotalBalance().getUsd());
+        BigDecimal btc = getTotalUserBalance(manager.getId()).getBtc().subtract(getTotalBalance().getBtc());
+        profit.setUsd(usd);
+        profit.setBtc(btc);
+        return profit;
     }
 }

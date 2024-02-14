@@ -15,7 +15,7 @@ import java.util.Optional;
  */
 public interface AccountService {
 
-    void addNewAccount(String code);
+    void addNewAccount(User user, String code);
     List<Account> getAllAccounts();
     List<Account> getAccountsByUser(Long userId);
     List<Account> getAccountsByCurrency(String code);
@@ -28,4 +28,5 @@ public interface AccountService {
     void updateAccount(Long id, Account account);
     List<Account> getAccountsBetweenAmount(BigDecimal from, BigDecimal to);
     Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code);
+    void createUserAccounts(User user);
 }

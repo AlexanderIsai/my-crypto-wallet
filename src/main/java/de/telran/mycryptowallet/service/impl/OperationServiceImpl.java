@@ -23,6 +23,7 @@ public class OperationServiceImpl implements OperationService {
     private final RateService rateService;
     private final AccountValidator accountValidator;
     private final AccountBusinessService accountBusinessService;
+    private final AccountManagerService accountManagerService;
 
     @Override
     @Transactional
@@ -38,19 +39,22 @@ public class OperationServiceImpl implements OperationService {
         accountValidator.isExistUserAccount(operationAccount);
         operation.setAccount(operationAccount);
 
-        Rate operationRate = rateService.getFreshRate(code);
-        operation.setRateValue(operationRate.getValue());
-
         operation.setAmount(amount);
 
         operation.setType(type);
+
+        Rate operationRate = rateService.getFreshRate(code);
+        operation.setRateValue(operation.getType().equals(OperationType.BUY) ? operationRate.getSellRate() : operationRate.getBuyRate());
+
         return operation;
     }
     @Transactional
     @Override
     public void addOrderOperation(User orderOwner, User orderExecutor, Order order, BigDecimal amount) {
         Operation buy = getExchangeOperation(orderOwner, order.getCurrency().getCode(), amount, OperationType.BUY);
+        buy.setRateValue(order.getRateValue());
         Operation sell = getExchangeOperation(orderExecutor, order.getCurrency().getCode(), amount, OperationType.SELL);
+        sell.setRateValue(order.getRateValue());
         operationRepository.save(buy);
         operationRepository.save(sell);
     }
@@ -81,6 +85,7 @@ public class OperationServiceImpl implements OperationService {
         Account accountBuy = operation.getAccount();
         accountBusinessService.withdraw(accountSell, operation.getAmount().multiply(operation.getRateValue()));
         accountBusinessService.deposit(accountBuy, operation.getAmount());
+        accountManagerService.buyManager(operation.getCurrency().getCode(), operation.getAmount());
     }
 
     @Override
@@ -90,6 +95,7 @@ public class OperationServiceImpl implements OperationService {
         Account accountSell = operation.getAccount();
         accountBusinessService.withdraw(accountSell, operation.getAmount());
         accountBusinessService.deposit(accountBuy, operation.getAmount().multiply(operation.getRateValue()));
+        accountManagerService.sellManager(operation.getCurrency().getCode(), operation.getAmount());
     }
     //TODO clear comments
 

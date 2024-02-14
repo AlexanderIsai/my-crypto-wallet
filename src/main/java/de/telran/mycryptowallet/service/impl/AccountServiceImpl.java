@@ -41,10 +41,10 @@ public class AccountServiceImpl implements AccountService {
     private final int SCALE = 2;
 
     @Override
-    public void addNewAccount(String code) {
+    public void addNewAccount(User user, String code) {
         //accountValidator.isNotExistUserAccount(getAccountByUserIdAndCurrency(activeUserService.getActiveUser().getId(), code).orElseThrow());
             Account account = new Account();
-            account.setUser(activeUserService.getActiveUser());
+            account.setUser(user);
             account.setPublicAddress(publicAddressGenerator.generatePublicAddress(code));
             account.setCurrency(currencyService.getCurrencyByCode(code));
             account.setBalance(BigDecimal.ZERO);
@@ -112,5 +112,12 @@ public class AccountServiceImpl implements AccountService {
     public Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code) {
         userValidator.isUserNotFound(userService.getUserById(userId));
         return accountRepository.findAccountByUserIdAndCurrencyCode(userId, code);
+    }
+
+    @Override
+    public void createUserAccounts(User user) {
+        currencyService.getAllCurrencies().forEach(currency ->
+                addNewAccount(user, currency.getCode())
+        );
     }
 }

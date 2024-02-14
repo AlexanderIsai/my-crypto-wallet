@@ -24,6 +24,7 @@ public class RateGenerator {
         String url = bitcoinUrl;
         return restTemplate.getForObject(url, Map.class);
     }
+
     //TODO расширить функционал (добавить другие валюты)
 
 }
