@@ -1,5 +1,6 @@
 package de.telran.mycryptowallet.service.interfaces;
 
+import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Operation;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.User;
@@ -21,7 +22,7 @@ public interface OperationService {
     void cashFlow(Operation operation) throws NotEnoughFundsException;
     void buy(Operation operation) throws NotEnoughFundsException;
     void sell(Operation operation) throws NotEnoughFundsException;
-    void transfer(Long fromId, Long toId, BigDecimal amount);
+    void transfer(Account from, Account to, BigDecimal amount);
     //TODO добавить админские методы (статистика и т.п.)
 
 }
