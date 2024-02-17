@@ -21,11 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * description
- *
- * @author Alexander Isai on 22.01.2024.
- */
 @RequiredArgsConstructor
 @Service
 public class AccountServiceImpl implements AccountService {
