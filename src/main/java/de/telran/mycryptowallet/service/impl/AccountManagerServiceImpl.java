@@ -28,18 +28,14 @@ public class AccountManagerServiceImpl implements AccountManagerService {
     @Override
     public void depositManager(String code, BigDecimal amount) {
         Account account = getManagerAccountByCurrency(code);
-        System.out.println(account);
         account.setBalance(account.getBalance().add(amount));
-        System.out.println("+" + amount);
         accountService.updateAccount(account.getId(), account);
     }
 
     @Override
     public void withdrawManager(String code, BigDecimal amount) {
         Account account = getManagerAccountByCurrency(code);
-        System.out.println(account);
         account.setBalance(account.getBalance().subtract(amount));
-        System.out.println("-" + amount);
         accountService.updateAccount(account.getId(), account);
     }
 

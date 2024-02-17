@@ -21,7 +21,6 @@ public class AccountValidator {
 
 
     public void isEnoughMoney(Account account, BigDecimal amount) {
-
             if (account.getBalance().compareTo(amount) < 0){
                 throw new NotEnoughFundsException("Sorry! You don't have enough money. Should you something borrow");
             }

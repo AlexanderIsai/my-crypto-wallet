@@ -3,6 +3,7 @@ import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
 import de.telran.mycryptowallet.repository.UserRepository;
 import de.telran.mycryptowallet.service.interfaces.UserService;
+import de.telran.mycryptowallet.service.utils.validators.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserValidator userValidator;
     @Override
     public void addNewUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -28,7 +30,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long id) {
-        return userRepository.findUserById(id);
+        User user = userRepository.findUserById(id);
+        userValidator.isUserNotFound(user);
+        return user;
     }
 
     @Override
@@ -59,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void toggleBlockUser(Long id) {
-        User user = userRepository.findUserById(id);
+        User user = getUserById(id);
         if(!user.getStatus().equals(UserStatus.BLOCKED)){
             user.setStatus(UserStatus.BLOCKED);
         }
@@ -71,8 +75,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changeUserPassword(Long id, String newPassword) {
-        User user = userRepository.findUserById(id);
-        System.out.println(user);
+        User user = getUserById(id);
         user.setPassword(passwordEncoder.encode(newPassword));
         updateUser(id, user);
     }

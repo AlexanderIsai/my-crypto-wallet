@@ -2,12 +2,11 @@ package de.telran.mycryptowallet.service.impl;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
 import de.telran.mycryptowallet.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
+import de.telran.mycryptowallet.service.utils.validators.UserValidator;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
     @Mock
@@ -24,13 +24,11 @@ class UserServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private UserValidator userValidator;
+
     @InjectMocks
     private UserServiceImpl userService;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void addNewUser() {
@@ -88,22 +86,21 @@ class UserServiceImplTest {
     @Test
     void updateUser() {
         Long userId = 1L;
-        User existingUser = new User();
-        existingUser.setId(userId);
-        existingUser.setUserName("OldName");
+        User mockUser = new User();
+        mockUser.setUserName("New");
+        UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
+        PasswordEncoder mockPasswordEncoder = Mockito.mock(PasswordEncoder.class);
+        UserValidator mockUserValidator = Mockito.mock(UserValidator.class);
+        UserServiceImpl userService = new UserServiceImpl(mockUserRepository, mockPasswordEncoder, mockUserValidator);
 
-        User updatedUser = new User();
-        updatedUser.setId(userId);
-        updatedUser.setUserName("NewName");
-
-        when(userRepository.findUserById(userId)).thenReturn(existingUser);
-        userService.updateUser(userId, updatedUser);
+        userService.updateUser(userId, mockUser);
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(userCaptor.capture());
-        User capturedUser = userCaptor.getValue();
+        Mockito.verify(mockUserRepository).save(userCaptor.capture());
+        User savedUser = userCaptor.getValue();
 
-        assertEquals("NewName", capturedUser.getUsername());
+        assertEquals(userId, savedUser.getId());
+        assertEquals("New", savedUser.getUsername());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package de.telran.mycryptowallet.controller;
 
 import de.telran.mycryptowallet.entity.Currency;
+import de.telran.mycryptowallet.service.interfaces.AccountService;
 import de.telran.mycryptowallet.service.interfaces.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.List;
 public class CurrencyController {
 
     private final CurrencyService currencyService;
+    private final AccountService accountService;
 
     @GetMapping(value = "/all")
     public List<Currency> showAllCurrencies(){
@@ -28,6 +30,7 @@ public class CurrencyController {
     @PostMapping(value = "/add-new-currency")
     public void addNewCurrency(@RequestBody Currency currency){
         currencyService.addCurrency(currency);
+        accountService.addAccountsWithNewCurrency(currency.getCode());
     }
 
     @GetMapping(value = "/{code}")

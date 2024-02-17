@@ -146,7 +146,7 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
         BigDecimal usdFrom = accounts.stream()
                 .filter(Objects::nonNull)
                 .filter(account -> !account.getCurrency().getCode().equals(currencyService.getBasicCurrency()))
-                .map(account -> account.getBalance().multiply(rateService.getFreshRate(account.getCurrency().getCode()).getValue()))
+                .map(account -> account.getBalance().multiply(rateService.getFreshRate(account.getCurrency().getCode()).getBuyRate()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return usdFrom;
     }
@@ -155,13 +155,13 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
         BigDecimal btcFrom = accounts.stream()
                 .filter(Objects::nonNull)
                 .filter(account -> !account.getCurrency().getCode().equals(currencyService.getBTCCurrency()) && !account.getCurrency().getCode().equals(currencyService.getBasicCurrency()))
-                .map(account -> account.getBalance().multiply(rateService.getFreshRate(account.getCurrency().getCode()).getValue()).divide(rateService.getFreshRate(currencyService.getBTCCurrency()).getValue(), SCALE, RoundingMode.HALF_DOWN))
+                .map(account -> account.getBalance().multiply(rateService.getFreshRate(account.getCurrency().getCode()).getBuyRate()).divide(rateService.getFreshRate(currencyService.getBTCCurrency()).getSellRate(), SCALE, RoundingMode.HALF_DOWN))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return btcFrom;
     }
 
     private BigDecimal getBTCBalanceFromUSDAccount(Account account){
-        return account.getBalance().divide(rateService.getFreshRate(currencyService.getBTCCurrency()).getValue(), SCALE, RoundingMode.HALF_DOWN);
+        return account.getBalance().divide(rateService.getFreshRate(currencyService.getBTCCurrency()).getSellRate(), SCALE, RoundingMode.HALF_DOWN);
     }
 
     @Transactional
@@ -175,4 +175,5 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
         profit.setBtc(btc);
         return profit;
     }
+    //TODO протестить прибыль)))
 }

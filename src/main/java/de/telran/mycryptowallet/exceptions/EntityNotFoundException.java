@@ -5,8 +5,8 @@ package de.telran.mycryptowallet.exceptions;
  *
  * @author Alexander Isai on 12.02.2024.
  */
-public class UserNotFoundException extends RuntimeException{
-    public UserNotFoundException(String message){
+public class EntityNotFoundException extends RuntimeException{
+    public EntityNotFoundException(String message){
         super(message);
     }
 

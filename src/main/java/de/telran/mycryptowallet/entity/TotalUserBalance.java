@@ -1,6 +1,7 @@
 package de.telran.mycryptowallet.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "total_balance")
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class TotalUserBalance {
 

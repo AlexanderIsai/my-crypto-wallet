@@ -4,6 +4,7 @@ import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.TotalUserBalance;
 import de.telran.mycryptowallet.entity.User;
+import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
 import de.telran.mycryptowallet.service.interfaces.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,4 +73,9 @@ public class AdminController {
         return accountBusinessService.showProfit();
     }
 
+
+    @GetMapping(value = "/users-with-status")
+    public List<User> showUsersByStatus(@RequestParam(name = "status") UserStatus status) {
+        return userService.getUsersByStatus(status);
+    }
 }
