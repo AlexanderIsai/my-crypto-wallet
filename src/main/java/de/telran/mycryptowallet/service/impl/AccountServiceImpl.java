@@ -32,17 +32,11 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
     private final CurrencyService currencyService;
-    private final ActiveUserService activeUserService;
-    private final AccountValidator accountValidator;
     private final UserValidator userValidator;
     private final PublicAddressGenerator publicAddressGenerator;
-    private final RateService rateService;
     private final UserService userService;
-    private final int SCALE = 2;
-
     @Override
     public void addNewAccount(User user, String code) {
-        //accountValidator.isNotExistUserAccount(getAccountByUserIdAndCurrency(activeUserService.getActiveUser().getId(), code).orElseThrow());
             Account account = new Account();
             account.setUser(user);
             account.setPublicAddress(publicAddressGenerator.generatePublicAddress(code));
@@ -50,6 +44,13 @@ public class AccountServiceImpl implements AccountService {
             account.setBalance(BigDecimal.ZERO);
             account.setOrderBalance(BigDecimal.ZERO);
             accountRepository.save(account);
+    }
+
+    @Transactional
+    @Override
+    public void addAccountsWithNewCurrency(String code){
+        List<User> users = userService.getAllUsers();
+        users.forEach(user -> addNewAccount(user, code));
     }
 
     @Override
@@ -114,6 +115,7 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.findAccountByUserIdAndCurrencyCode(userId, code);
     }
 
+    @Transactional
     @Override
     public void createUserAccounts(User user) {
         currencyService.getAllCurrencies().forEach(currency ->

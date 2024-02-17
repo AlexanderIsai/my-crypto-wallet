@@ -3,7 +3,7 @@ package de.telran.mycryptowallet.service.utils.validators;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
 import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
-import de.telran.mycryptowallet.exceptions.UserNotFoundException;
+import de.telran.mycryptowallet.exceptions.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,14 +17,13 @@ import org.springframework.stereotype.Component;
 public class UserValidator {
 
     public void isUserBlock(UserStatus userStatus) {
-
         if(userStatus.equals(UserStatus.BLOCKED)){
             throw new UserIsBlockedException("User is blocked!!!");
         }
     }
     public void isUserNotFound(User user) {
         if(user == null){
-            throw new UserNotFoundException("User is not found!!!");
+            throw new EntityNotFoundException("User is not found!!!");
         }
     }
 }
