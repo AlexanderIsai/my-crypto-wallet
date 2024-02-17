@@ -10,11 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * description
- *
- * @author Alexander Isai on 20.01.2024.
- */
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {

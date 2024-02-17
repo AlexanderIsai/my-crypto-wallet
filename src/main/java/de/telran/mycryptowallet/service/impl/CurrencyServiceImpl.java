@@ -9,11 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * description
- *
- * @author Alexander Isai on 22.01.2024.
- */
 @Service
 @RequiredArgsConstructor
 public class CurrencyServiceImpl implements CurrencyService {
