@@ -7,15 +7,29 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 /**
- * description
- *
- * @author Alexander Isai on 25.01.2024.
+ * @author Alexander Isai
+ * @version 25.01.2024
  */
 @Data
 public class OrderAddDTO {
 
+    /**
+     * Currency code for the order.
+     */
     private String currencyCode;
+
+    /**
+     * Type of operation (e.g., BUY, SELL) for the order.
+     */
     private OperationType operationType;
+
+    /**
+     * Monetary value for the order.
+     */
     private BigDecimal amount;
+
+    /**
+     * Specified rate for the order execution.
+     */
     private BigDecimal orderRate;
 }
