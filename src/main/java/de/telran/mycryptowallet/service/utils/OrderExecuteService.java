@@ -64,6 +64,7 @@ public class OrderExecuteService {
         }
     }
     @Scheduled(cron = "0 */6 * * * *")
+    @Transactional
     public void executeSellOrders(){
         List<Order> ordersSell = orderService.getOrdersByStatusAndType(OrderStatus.ACTIVE, OperationType.SELL);
         for (Order order : ordersSell) {

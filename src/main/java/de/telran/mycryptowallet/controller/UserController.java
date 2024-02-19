@@ -4,6 +4,7 @@ import de.telran.mycryptowallet.exceptions.EntityNotFoundException;
 import de.telran.mycryptowallet.service.interfaces.AccountService;
 import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
 import de.telran.mycryptowallet.service.interfaces.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
+    @Operation(summary = "Получить пользователя по ID", description = "Возвращает подробную информацию о пользователе по его уникальному идентификатору")
     public ResponseEntity<User> showUserById(@PathVariable(value = "id") Long id) {
         User user = userService.getUserById(id);
         if (user != null) {
