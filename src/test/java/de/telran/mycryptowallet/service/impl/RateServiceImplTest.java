@@ -82,9 +82,7 @@ class RateServiceImplTest {
         assert freshRate.equals(rate);
     }
 
-    // This method is stubbed to return null, so we might not need to test it unless it's implemented.
     @Test
     void setOrderRateTest() {
-        // Implement test if the method 'setOrderRate' has a body.
     }
 }

@@ -139,6 +139,7 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal orderAmount = getOrderAmount(order);
         orderAccount.setOrderBalance(orderAccount.getOrderBalance().subtract(orderAmount));
         orderAccount.setBalance(orderAccount.getBalance().add(orderAmount));
+        System.out.println(orderAccount);
         accountService.updateAccount(orderAccount.getId(), orderAccount);
         updateOrder(orderId, order);
     }
