@@ -26,6 +26,7 @@ public class OperationController {
     private final ActiveUserService activeUserService;
 
     @PostMapping(value = "/add")
+    @io.swagger.v3.oas.annotations.Operation(summary = "Создать операцию", description = "Создает новую операцию для активного пользователя - депозит/снятие/покупка/продажа")
     public void addOperation(@RequestBody OperationAddDTO operationAddDTO)  {
         Operation operation = operationService.getExchangeOperation(activeUserService.getActiveUser(), operationAddDTO.getCurrencyCode(), operationAddDTO.getAmount(), operationAddDTO.getType());
         operationService.cashFlow(operation);

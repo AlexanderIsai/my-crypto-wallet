@@ -7,6 +7,7 @@ import de.telran.mycryptowallet.exceptions.UserIsBlockedException;
 import de.telran.mycryptowallet.service.interfaces.AccountBusinessService;
 import de.telran.mycryptowallet.service.interfaces.AccountService;
 import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -32,21 +33,24 @@ public class AccountController {
 
 
     @PostMapping(value = "/add")
+    @Operation(summary = "Добавить новый счет", description = "Создает и сохраняет счет в БД в заданной валюте для активного пользователя")
     public void addNewAccount(@RequestBody AccountAddDTO accountAddDTO) {
-
         accountService.addNewAccount(activeUserService.getActiveUser(), accountAddDTO.getCurrencyCode());
     }
 
     @GetMapping(value = "/my")
+    @Operation(summary = "Показать аккаунты активного пользователя", description = "Возвращает подробную информацию об аккаунтах активного пользователя")
     public List<Account> showAccountsByUser() {
         return accountService.getAccountsByUser(activeUserService.getActiveUser().getId());
     }
     @GetMapping(value = "/user-currency")
+    @Operation(summary = "Показать аккаунт по пользователю и валюте", description = "Возвращает подробную информацию об аккаунте по пользователю и валюте")
     public Account showAccountByIdAndUserId(@RequestParam(name = "userId") Long userId, @RequestParam(name = "code") String code) {
         return accountService.getAccountByUserIdAndCurrency(userId, code).orElseThrow();
     }
 
     @GetMapping(value = "/address")
+    @Operation(summary = "Показать аккаунт по публичному адресу", description = "Возвращает подробную информацию об аккаунте по публичному адресу")
     public ResponseEntity<Account> showAccountByAddress(@RequestParam(name = "address") String address) {
         Account account = accountService.getAccountByPublicAddress(address);
         if (account != null) {
@@ -58,11 +62,13 @@ public class AccountController {
     }
 
     @PutMapping(value = "/{id}")
+    @Operation(summary = "Изменить аккаунт по ID", description = "Изменяет заданный по ID аккаунт")
     public void updateAccount(@PathVariable(name = "id") Long id, @RequestBody Account account) {
         accountService.updateAccount(id, account);
     }
 
     @GetMapping(value = "/total-balance")
+    @Operation(summary = "Показать общий баланс активного пользователя", description = "Возвращает значение общего баланса активного пользователя в двух проекциях - долларе и битках")
     public TotalUserBalance showTotalUserBalance(){
         return accountBusinessService.getTotalUserBalance(activeUserService.getActiveUser().getId());
     }

@@ -2,7 +2,9 @@ package de.telran.mycryptowallet.dto;
 
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.entity.entityEnum.OrderStatus;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Data Transfer Object (DTO) for displaying order information. It includes the currency code,
@@ -12,6 +14,8 @@ import lombok.Data;
  * @version 11.02.2024
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderShowDTO {
 
     /**

@@ -105,6 +105,17 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
+    public void resetAllAccounts() {
+        List<Account> accounts = accountRepository.getAllAccounts();
+        accounts.forEach(account -> {
+            account.setBalance(BigDecimal.ZERO);
+            account.setOrderBalance(BigDecimal.ZERO);
+            updateAccount(account.getId(), account);
+        });
+    }
+
+    @Override
     public Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code) {
         userValidator.isUserNotFound(userService.getUserById(userId));
         return accountRepository.findAccountByUserIdAndCurrencyCode(userId, code);

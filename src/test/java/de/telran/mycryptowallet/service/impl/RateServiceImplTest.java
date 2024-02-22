@@ -70,11 +70,11 @@ class RateServiceImplTest {
 
     @Test
     void getFreshRateTest() {
-        when(currencyService.getBasicCurrency()).thenReturn("USD");
-        when(currencyService.getCurrencyByCode("USD")).thenReturn(new Currency("USD", "United States Dollar"));
+        when(currencyService.getBasicCurrency()).thenReturn("USDT");
+        when(currencyService.getCurrencyByCode("USDT")).thenReturn(new Currency("USDT", "Tether"));
         when(rateRepository.getFreshRate("BTC")).thenReturn(rate);
 
-        Rate basicRate = rateService.getFreshRate("USD");
+        Rate basicRate = rateService.getFreshRate("USDT");
         Rate freshRate = rateService.getFreshRate("BTC");
 
         verify(rateRepository, times(1)).getFreshRate("BTC");

@@ -48,7 +48,6 @@ public class User implements UserDetails {
     @NotEmpty(message = "Email should not be empty")
     @Column(nullable = false, unique = true, name = "email")
     private String email;
-//TODO подумать про индексацию и валидацию поля
 
     @Column(nullable = false, name = "password")
     @Size(min = 4, max = 60, message = "Password should be between 4 and 60 symbols")

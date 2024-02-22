@@ -10,6 +10,7 @@ import java.math.BigDecimal;
  * @author Alexander Isai
  * @version 25.01.2024
  */
+//TODO add comment
 @Data
 public class OrderAddDTO {
 
