@@ -30,8 +30,8 @@ public class WebSecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(request -> {
-                    request.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/index.html").permitAll(); // Разрешить доступ к Swagger UI
-                    request.requestMatchers(HttpMethod.GET, "/admin/show-all-users").hasRole("ADMIN");
+                    request.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/index.html").permitAll();
+                    request.requestMatchers(HttpMethod.GET, "/admin/**").hasRole("ADMIN");
                     request.requestMatchers(HttpMethod.POST, "/currency/add-new-currency").hasRole("ADMIN");
 
                     request.anyRequest().permitAll();

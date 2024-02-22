@@ -8,6 +8,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.util.Optional;
+
 /**
  * description
  *
@@ -105,5 +107,10 @@ public class OperationServiceImpl implements OperationService {
         accountService.updateAccount(sender.getId(), sender);
         receiver.setBalance(receiver.getBalance().add(amount));
         accountService.updateAccount(receiver.getId(), receiver);
+    }
+
+    @Override
+    public Optional<Operation> getOperationById(Long id) {
+        return operationRepository.findOperationById(id);
     }
 }

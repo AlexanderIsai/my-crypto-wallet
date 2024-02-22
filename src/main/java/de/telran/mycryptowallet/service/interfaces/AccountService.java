@@ -131,4 +131,6 @@ public interface AccountService {
      * @return a list of accounts with a balance between the specified amounts
      */
     List<Account> getAccountsBetweenAmount(BigDecimal from, BigDecimal to);
+
+    void resetAllAccounts();
 }
