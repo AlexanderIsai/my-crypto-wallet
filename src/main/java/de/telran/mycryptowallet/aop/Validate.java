@@ -7,7 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  * description
- *
+ * The class is in development.
+ * It is not used in the project.
  * @author Alexander Isai on 03.02.2024.
  */
 @Target({ElementType.FIELD, ElementType.METHOD})

@@ -7,8 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * description
- *
+ * This class represents a Data Transfer Object (DTO) for adding a new user to the system.
+ * It encapsulates the necessary information required to create a user, including the user's name,
+ * email, and password. Validation annotations ensure that the provided data meets the system's requirements
+ * for user creation.
+ * This DTO is typically used in the process of registering a new user, where the client-side application collects
+ * user information and sends it to the server-side application for processing.
  * @author Alexander Isai on 23.02.2024.
  */
 @Data

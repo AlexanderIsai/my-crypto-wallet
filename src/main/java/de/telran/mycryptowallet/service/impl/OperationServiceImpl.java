@@ -37,7 +37,7 @@ public class OperationServiceImpl implements OperationService {
         Currency operationCurrency = currencyService.getCurrencyByCode(code);
         operation.setCurrency(operationCurrency);
 
-        Account operationAccount = accountService.getAccountByUserIdAndCurrency(user.getId(), operationCurrency.getCode()).orElseThrow();
+        Account operationAccount = accountService.getAccountByUserIdAndCurrency(user.getId(), operationCurrency.getCode());
         accountValidator.isExistUserAccount(operationAccount);
         operation.setAccount(operationAccount);
 
@@ -82,7 +82,7 @@ public class OperationServiceImpl implements OperationService {
 
     @Override
     public void buy(Operation operation) {
-        Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
+        Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency());
         //Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
         Account accountBuy = operation.getAccount();
         accountBusinessService.withdraw(accountSell, operation.getAmount().multiply(operation.getRateValue()));
@@ -92,7 +92,7 @@ public class OperationServiceImpl implements OperationService {
 
     @Override
     public void sell(Operation operation) {
-        Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
+        Account accountBuy = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), currencyService.getBasicCurrency());
         //Account accountSell = accountService.getAccountByUserIdAndCurrency(operation.getUser().getId(), operation.getCurrency().getCode()).orElseThrow();
         Account accountSell = operation.getAccount();
         accountBusinessService.withdraw(accountSell, operation.getAmount());

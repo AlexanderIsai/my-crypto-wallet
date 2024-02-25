@@ -62,8 +62,8 @@ public class TradeBotService {
         Operation operationBuy = new Operation();
         operationBuy.setUser(user);
         operationBuy.setCurrency(currencyService.getCurrencyByCode(currencyService.getBTCCurrency()));
-        Account accountBTCBuyer = accountService.getAccountByUserIdAndCurrency(user.getId(), currencyService.getBTCCurrency()).orElseThrow();
-        Account accountUSDBuyer = accountService.getAccountByUserIdAndCurrency(user.getId(), currencyService.getBasicCurrency()).orElseThrow();
+        Account accountBTCBuyer = accountService.getAccountByUserIdAndCurrency(user.getId(), currencyService.getBTCCurrency());
+        Account accountUSDBuyer = accountService.getAccountByUserIdAndCurrency(user.getId(), currencyService.getBasicCurrency());
         operationBuy.setAccount(accountBTCBuyer);
         Rate operationRate = rateService.getFreshRate(currencyService.getBTCCurrency());
         operationBuy.setRateValue(operationRate.getValue());
@@ -77,7 +77,7 @@ public class TradeBotService {
         Operation operationSell = new Operation();
         operationSell.setUser(user);
         operationSell.setCurrency(currencyService.getCurrencyByCode(currencyService.getBTCCurrency()));
-        Account accountBTCSeller = accountService.getAccountByUserIdAndCurrency(user.getId(), currencyService.getBTCCurrency()).orElseThrow();
+        Account accountBTCSeller = accountService.getAccountByUserIdAndCurrency(user.getId(), currencyService.getBTCCurrency());
         operationSell.setAccount(accountBTCSeller);
         Rate operationRate = rateService.getFreshRate(currencyService.getBTCCurrency());
         operationSell.setRateValue(operationRate.getValue());

@@ -13,9 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * description
+ * The UserController class handles web requests related to user operations.
+ * It provides functionalities such as adding new users, displaying user information by ID or email,
+ * updating user details, and checking if a user exists by their email address.
  *
- * @author Alexander Isai on 20.01.2024.
+ * @author Alexander Isai
+ * @version 20.01.2024
  */
 @RestController
 @RequiredArgsConstructor
@@ -26,15 +29,26 @@ public class UserController {
     private final ActiveUserService activeUserService;
     private final AccountService accountService;
 
+    /**
+     * Creates a new user along with all possible accounts for that user.
+     *
+     * @param userAddDTO DTO containing user details to be added.
+     */
     @PostMapping(value = "/add-new-user")
-    @Operation(summary = "Создать нового пользователя", description = "Создает нового пользователя и все возможные счета для него")
+    @Operation(summary = "Add new user", description = "Creates a new user and all possible accounts for that user")
     public void save(@RequestBody @Valid UserAddDTO userAddDTO) {
         userService.addNewUser(userAddDTO.getName(), userAddDTO.getEmail(), userAddDTO.getPassword());
         accountService.createUserAccounts(userService.getUserByEmail(userAddDTO.getEmail()));
     }
 
+    /**
+     * Retrieves detailed information about a user by their unique identifier.
+     *
+     * @param id The unique identifier of the user.
+     * @return ResponseEntity containing the user details.
+     */
     @GetMapping(value = "/{id}")
-    @Operation(summary = "Получить пользователя по ID", description = "Возвращает подробную информацию о пользователе по его уникальному идентификатору")
+    @Operation(summary = "Show user by ID", description = "Returns detailed information about the user by their unique identifier")
     public ResponseEntity<User> showUserById(@PathVariable(value = "id") Long id) {
         User user = userService.getUserById(id);
         if (user != null) {
@@ -44,30 +58,54 @@ public class UserController {
         }
     }
 
+    /**
+     * Returns detailed information about the currently active user.
+     *
+     * @return ResponseEntity containing the active user details.
+     */
     @GetMapping(value = "/active-user")
-    @Operation(summary = "Получить активного пользователя", description = "Возращает подробную информацию об активном пользователе")
+    @Operation(summary = "Show active user", description = "Returns detailed information about the active user")
     public ResponseEntity<User> getActiveUser() {
         User user = activeUserService.getActiveUser();
         if (user != null) {
             return ResponseEntity.ok(user);
-        } else  {
+        } else {
             throw new EntityNotFoundException("User is not found");
         }
     }
 
+    /**
+     * Retrieves detailed information about a user by their email address.
+     *
+     * @param email The email address of the user.
+     * @return ResponseEntity containing the user details.
+     */
     @GetMapping(value = "/email")
-    @Operation(summary = "Получить пользователя по email", description = "Возвращает подробную информацию о пользователе по email")
+    @Operation(summary = "Show user by e-mail", description = "Returns detailed information about the user by e-mail")
     public ResponseEntity<User> showUserByEmail(@RequestParam(value = "email") String email) {
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
+    /**
+     * Updates the details of an existing user identified by ID.
+     *
+     * @param id The unique identifier of the user.
+     * @param user User object containing updated details.
+     */
     @PutMapping(value = "/{id}")
-    @Operation(summary = "Изменить пользователя по ID", description = "Сохраняет изменения в объекте пользователь под соответствующим ID")
+    @Operation(summary = "Update user by ID", description = "Saves the changes in the object to the user under the corresponding ID")
     public void updateUser(@PathVariable(value = "id") Long id, @RequestBody User user) {
         userService.updateUser(id, user);
     }
+
+    /**
+     * Checks if a user exists in the database by their email address.
+     *
+     * @param email The email address of the user to check.
+     * @return Boolean indicating if the user exists.
+     */
     @GetMapping(value = "/exist")
-    @Operation(summary = "Проверяет наличие пользователя в БД по email", description = "Возвращает результат проверки наличия пользователя в БД по email")
+    @Operation(summary = "Checks if the user is in the database by email", description = "Returns the result of checking if the user is available in the database by email")
     public Boolean isExistUserByEmail(@RequestParam(name = "email") String email) {
         return userService.isExistUserByEmail(email);
     }

@@ -1,4 +1,4 @@
-package de.telran.mycryptowallet;
+package de.telran.mycryptowallet.config;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
