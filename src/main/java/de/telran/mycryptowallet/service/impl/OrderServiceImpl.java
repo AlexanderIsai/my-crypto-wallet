@@ -107,11 +107,11 @@ public class OrderServiceImpl implements OrderService {
         orderValidator.isOrderActive(order);
         User executorOrder = activeUserService.getActiveUser(); //юзер, который хочет его выполнить
         User ownerOrder = userService.getUserById(order.getUser().getId());//юзер, который владеет ордером
-        Account ownerBasicAccount = accountService.getAccountByUserIdAndCurrency(ownerOrder.getId(), currencyService.getBasicCurrency()).orElseThrow(); //счет владельца ордера в базовой валюте (доллар), потому что он хочет купить крипту
-        Account ownerOrderAccount = accountService.getAccountByUserIdAndCurrency(ownerOrder.getId(), order.getCurrency().getCode()).orElseThrow(); // счет владельца ордера в валюте ордера - туда должны упасть Битки
+        Account ownerBasicAccount = accountService.getAccountByUserIdAndCurrency(ownerOrder.getId(), currencyService.getBasicCurrency()); //счет владельца ордера в базовой валюте (доллар), потому что он хочет купить крипту
+        Account ownerOrderAccount = accountService.getAccountByUserIdAndCurrency(ownerOrder.getId(), order.getCurrency().getCode()); // счет владельца ордера в валюте ордера - туда должны упасть Битки
 
-        Account executerBasicAccount = accountService.getAccountByUserIdAndCurrency(executorOrder.getId(), currencyService.getBasicCurrency()).orElseThrow(); //счет исполнителя ордера в базовой валюте (доллар), потому что он хочет продать крипту
-        Account executerOrderAccount = accountService.getAccountByUserIdAndCurrency(executorOrder.getId(), order.getCurrency().getCode()).orElseThrow(); //счет исполнителя ордера в валюте ордера - сейчас Биток
+        Account executerBasicAccount = accountService.getAccountByUserIdAndCurrency(executorOrder.getId(), currencyService.getBasicCurrency()); //счет исполнителя ордера в базовой валюте (доллар), потому что он хочет продать крипту
+        Account executerOrderAccount = accountService.getAccountByUserIdAndCurrency(executorOrder.getId(), order.getCurrency().getCode()); //счет исполнителя ордера в валюте ордера - сейчас Биток
         OperationType operationType = order.getType();
 
         cancelOrder(order.getId());

@@ -73,7 +73,7 @@ public interface AccountService {
      * @param code the currency code
      * @return an Optional containing the account if found
      */
-    Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code);
+    Account getAccountByUserIdAndCurrency(Long userId, String code);
 
     /**
      * Creates default accounts for a new user.

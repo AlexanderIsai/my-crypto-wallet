@@ -58,13 +58,13 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
         //accountValidator.isExistUserAccount(getAccountByUserIdAndCurrency(user.getId(), code).orElseThrow());
         switch (type) {
             case BUY:
-                Account accountBuy = accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), currencyService.getBasicCurrency()).orElseThrow();
+                Account accountBuy = accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), currencyService.getBasicCurrency());
                 reserveAmount = amount.multiply(rate);
                 accountValidator.isEnoughMoney(accountBuy, reserveAmount);
                 reserveMoney(accountBuy, reserveAmount);
                 break;
             case SELL:
-                Account accountSell = accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), code).orElseThrow();
+                Account accountSell = accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), code);
                 reserveAmount = amount;
                 accountValidator.isEnoughMoney(accountSell, amount);
                 reserveMoney(accountSell, reserveAmount);
@@ -80,10 +80,10 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
     @Override
     public Account getAccountFromOrder(Order order) {
         if(order.getType().equals(OperationType.BUY)){
-            return accountRepository.findAccountByUserIdAndCurrencyCode(order.getUser().getId(), currencyService.getBasicCurrency()).orElseThrow();
+            return accountRepository.findAccountByUserIdAndCurrencyCode(order.getUser().getId(), currencyService.getBasicCurrency());
         }
         else {
-            return accountRepository.findAccountByUserIdAndCurrencyCode(order.getUser().getId(), order.getCurrency().getCode()).orElseThrow();
+            return accountRepository.findAccountByUserIdAndCurrencyCode(order.getUser().getId(), order.getCurrency().getCode());
         }
 
     }
@@ -102,13 +102,13 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
         TotalUserBalance totalUserBalance = new TotalUserBalance();
 
         BigDecimal usdFrom = getUsdBalanceFromCryptoAccounts(accounts);
-        BigDecimal usdBase = accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBasicCurrency()).orElseThrow().getBalance();
-        BigDecimal usdOrderBase = accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBasicCurrency()).orElseThrow().getOrderBalance();
+        BigDecimal usdBase = accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBasicCurrency()).getBalance();
+        BigDecimal usdOrderBase = accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBasicCurrency()).getOrderBalance();
 
         BigDecimal btcFrom = getBTCBalanceFromCryptoAccounts(accounts);
-        BigDecimal btcFromUsd = getBTCBalanceFromUSDAccount(accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBasicCurrency()).orElseThrow());
-        BigDecimal btcBase = accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBTCCurrency()).orElseThrow().getBalance();
-        BigDecimal btcOrderBase = accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBTCCurrency()).orElseThrow().getOrderBalance();
+        BigDecimal btcFromUsd = getBTCBalanceFromUSDAccount(accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBasicCurrency()));
+        BigDecimal btcBase = accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBTCCurrency()).getBalance();
+        BigDecimal btcOrderBase = accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBTCCurrency()).getOrderBalance();
 
         totalUserBalance.setUsd(usdBase.add(usdFrom).add(usdOrderBase));
         totalUserBalance.setBtc(btcBase.add(btcFrom).add(btcFromUsd).add(btcOrderBase));

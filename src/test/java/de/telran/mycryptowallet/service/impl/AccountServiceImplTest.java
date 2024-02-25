@@ -147,12 +147,12 @@ class AccountServiceImplTest {
         Long userId = 1L;
         String currencyCode = "BTC";
         Account expectedAccount = new Account();
-        when(accountRepository.findAccountByUserIdAndCurrencyCode(userId, currencyCode)).thenReturn(Optional.of(expectedAccount));
+        when(accountRepository.findAccountByUserIdAndCurrencyCode(userId, currencyCode)).thenReturn(expectedAccount);
 
-        Optional<Account> actualAccount = accountService.getAccountByUserIdAndCurrency(userId, currencyCode);
+        Account actualAccount = accountService.getAccountByUserIdAndCurrency(userId, currencyCode);
 
-        assertTrue(actualAccount.isPresent());
-        assertEquals(expectedAccount, actualAccount.get());
+        //assertTrue(actualAccount.isPresent());
+        assertEquals(expectedAccount, actualAccount);
         verify(accountRepository).findAccountByUserIdAndCurrencyCode(userId, currencyCode);
     }
 

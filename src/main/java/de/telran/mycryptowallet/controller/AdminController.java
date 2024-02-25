@@ -1,5 +1,4 @@
 package de.telran.mycryptowallet.controller;
-
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.TotalUserBalance;
@@ -10,15 +9,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
+
 
 /**
- * description
+ * The AdminController class manages administrative tasks such as user and account management,
+ * order viewing, and application-wide balance and profit reporting. It provides endpoints for
+ * blocking or unblocking users, changing user passwords, displaying all users and accounts,
+ * showing user-specific accounts and orders, listing accounts by currency, reporting total balance
+ * and profits, showing users by status, and resetting all account balances.
+ * Each endpoint is annotated with Swagger documentation for ease of use in API exploration tools.
  *
- * @author Alexander Isai on 03.02.2024.
+ *  @author Alexander Isai
+ *  @version 22.01.2024
  */
 @RestController
 @RequiredArgsConstructor
@@ -32,70 +35,69 @@ public class AdminController {
     private final OrderService orderService;
 
     @GetMapping(value = "/show-all-users")
-    @Operation(summary = "Показать всех юзеров", description = "Возвращает подробную информацию обо всех юзерах")
+    @Operation(summary = "Show all users", description = "Returns detailed information about all users")
     public List<User> showAllUsers() {
         return userService.getAllUsers();
     }
 
     @PutMapping(value = "/block")
-    @Operation(summary = "Заблокировать пользователя по ID", description = "Блокирует пользователя по ID. Пользователю более недоступны операции со счетами")
-    public void toggleBlockUser(@RequestParam(name = "id") Long id){
+    @Operation(summary = "Block/unblock a user by ID", description = "Blocks a user by ID. The user is no longer able to make transactions with accounts")
+    public void toggleBlockUser(@RequestParam(name = "id") Long id) {
         userService.toggleBlockUser(id);
     }
 
     @PutMapping(value = "/set-password/{id}")
-    @Operation(summary = "Изменить пароль пользователю по ID", description = "Меняет пароль заданному по ID пользователю.")
-    public void changeUserPassword(@PathVariable(value = "id") Long id, @RequestParam (value = "password") String newPassword){
+    @Operation(summary = "Change the password for a user by ID", description = "Changes the password for the user specified by ID")
+    public void changeUserPassword(@PathVariable(value = "id") Long id, @RequestParam(value = "password") String newPassword) {
         userService.changeUserPassword(id, newPassword);
     }
 
     @GetMapping(value = "/show-all-accounts")
-    @Operation(summary = "Показать все аккаунты", description = "Возвращает подробную информацию обо всех аккаунтах")
+    @Operation(summary = "Show all accounts", description = "Returns detailed information about all accounts")
     public List<Account> showAllAccounts() {
         return accountService.getAllAccounts();
     }
 
-    @GetMapping(value = "/show-user-account")
-    @Operation(summary = "Показать аккаунт пользователя по ID", description = "Возвращает подробную информацию об аккаунте пользователя, заданного по ID")
+    @GetMapping(value = "/show-user-accounts")
+    @Operation(summary = "show users accounts by ID", description = "Returns detailed accounts information for the user account specified by ID")
     public List<Account> showAccountsByUser(@RequestParam(name = "userId") Long userId) {
         return accountService.getAccountsByUser(userId);
     }
 
     @GetMapping(value = "/show-orders")
-    @Operation(summary = "Показать все ордера", description = "Возвращает подробную информацию обо всех ордерах")
+    @Operation(summary = "Show all orders by user", description = "Returns detailed information about all orders by user")
     public List<Order> showOrdersByUser(@RequestParam(name = "userId") Long userId) {
         return orderService.getUsersOrders(userId);
     }
 
     @GetMapping(value = "/accounts-currency")
-    @Operation(summary = "Показать все аккаунты по валюте", description = "Возвращает подробную информацию обо всех аккаунтах по заданной валюте")
+    @Operation(summary = "Show all accounts by currency", description = "Returns detailed information about all accounts for a given currency")
     public List<Account> showAccountsByCurrency(@RequestParam(name = "code") String code) {
         return accountService.getAccountsByCurrency(code);
     }
 
     @GetMapping(value = "/show-total-balance")
-    @Operation(summary = "Показать баланс по приложению", description = "Возвращает общий баланс по приложению (сумма всех аккантов) в проекциях доллара и биткойна")
-    public TotalUserBalance showAllBalances(){
+    @Operation(summary = "Show balance by app", description = "Returns the total balance for the application (sum of all accounts) in dollar and bitcoin projections")
+    public TotalUserBalance showAllBalances() {
         return accountBusinessService.getTotalBalance();
     }
 
     @GetMapping(value = "/profit")
-    @Operation(summary = "Показать прибыль приложения", description = "Возвращает значение прибыли приложения в двух проекциях - в долларе и в биткойне")
-    public TotalUserBalance showProfit(){
+    @Operation(summary = "Show the app's profits", description = "Returns the application's profit value in two projections - in dollars and in bitcoin")
+    public TotalUserBalance showProfit() {
         return accountBusinessService.showProfit();
     }
 
 
     @GetMapping(value = "/users-with-status")
-    @Operation(summary = "Показать всех юзеров по статусу", description = "Возвращает подробную информацию обо всех юзерах с заданным статусом")
+    @Operation(summary = "Show all users by status", description = "Returns detailed information about all users with the specified status")
     public List<User> showUsersByStatus(@RequestParam(name = "status") UserStatus status) {
         return userService.getUsersByStatus(status);
     }
 
     @GetMapping(value = "/accounts-reset")
-    @Operation(summary = "Обнулить все аккаунты", description = "Обнуляет балансы всех аккаунтов")
-    public void resetAllAccounts(){
+    @Operation(summary = "Zero out all accounts", description = "Clears the balances of all accounts")
+    public void resetAllAccounts() {
         accountService.resetAllAccounts();
     }
-
 }

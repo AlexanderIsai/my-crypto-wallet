@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * description
- *
+ * The class is in development.
+ * It is not used in the project.
  * @author Alexander Isai on 03.02.2024.
  */
 @Component
@@ -16,6 +17,5 @@ public class ValidationAspect {
 
     @Before("@annotation(validate)")
     public void validate(JoinPoint joinPoint, Validate validate){
-
     }
 }

@@ -1,6 +1,7 @@
 package de.telran.mycryptowallet.service.impl;
 
 import de.telran.mycryptowallet.entity.Currency;
+import de.telran.mycryptowallet.exceptions.IncorrectInputException;
 import de.telran.mycryptowallet.repository.CurrencyRepository;
 import de.telran.mycryptowallet.service.interfaces.CurrencyService;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,9 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public Currency getCurrencyByCode(String code) {
+        if(!isExistCurrencyByCode(code)){
+            throw new IncorrectInputException("Currency with this code is not exist");
+        }
         return currencyRepository.findCurrencyByCode(code);
     }
 

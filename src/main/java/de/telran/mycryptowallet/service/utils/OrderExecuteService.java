@@ -46,7 +46,7 @@ public class OrderExecuteService {
 
                 operation.setCurrency(order.getCurrency());
 
-                Account account = accountService.getAccountByUserIdAndCurrency(user.getId(), order.getCurrency().getCode()).orElseThrow();
+                Account account = accountService.getAccountByUserIdAndCurrency(user.getId(), order.getCurrency().getCode());
                 operation.setAccount(account);
 
                 Rate rate = rateService.getFreshRate(order.getCurrency().getCode());
@@ -76,7 +76,7 @@ public class OrderExecuteService {
 
                 operation.setCurrency(order.getCurrency());
 
-                Account account = accountService.getAccountByUserIdAndCurrency(user.getId(), order.getCurrency().getCode()).orElseThrow();
+                Account account = accountService.getAccountByUserIdAndCurrency(user.getId(), order.getCurrency().getCode());
                 operation.setAccount(account);
 
                 Rate rate = rateService.getFreshRate(order.getCurrency().getCode());

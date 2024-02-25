@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * description
+ * The {@code OperationController} class provides endpoints for managing operations such as deposits, withdrawals, buys, and sells within the cryptocurrency wallet platform.
+ * It interacts with the {@code OperationService} to perform the underlying business logic associated with each operation type.
+ * The active user's operations are determined based on their current authentication status, ensuring that transactions are securely and correctly associated with the user's account.
  *
- * @author Alexander Isai on 24.01.2024.
+ * @author Alexander Isai
+ * @version 24.01.2024
  */
 @RestController
 @RequiredArgsConstructor
@@ -25,8 +28,15 @@ public class OperationController {
     private final OperationService operationService;
     private final ActiveUserService activeUserService;
 
+    /**
+     * Endpoint to add a new operation (deposit, withdrawal, buy, sell) for the active user.
+     * This method creates a new transaction based on the input from {@code OperationAddDTO}, which includes the currency code, amount, and type of operation.
+     * The actual execution of the operation is handled by {@code operationService}, which performs the necessary business logic and updates the user's account accordingly.
+     *
+     * @param operationAddDTO Data Transfer Object containing details of the operation such as currency code, amount, and operation type.
+     */
     @PostMapping(value = "/add")
-    @io.swagger.v3.oas.annotations.Operation(summary = "Создать операцию", description = "Создает новую операцию для активного пользователя - депозит/снятие/покупка/продажа")
+    @io.swagger.v3.oas.annotations.Operation(summary = "Add operation", description = "Creates a new transaction for the active user - deposit/withdrawal/buy/sell")
     public void addOperation(@RequestBody OperationAddDTO operationAddDTO)  {
         Operation operation = operationService.getExchangeOperation(activeUserService.getActiveUser(), operationAddDTO.getCurrencyCode(), operationAddDTO.getAmount(), operationAddDTO.getType());
         operationService.cashFlow(operation);

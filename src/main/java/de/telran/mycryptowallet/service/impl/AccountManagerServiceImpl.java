@@ -41,7 +41,7 @@ public class AccountManagerServiceImpl implements AccountManagerService {
 
     private Account getManagerAccountByCurrency(String code) {
         User manager = userService.getUserByEmail("manager@ukr.net");
-        return accountRepository.findAccountByUserIdAndCurrencyCode(manager.getId(), code).orElseThrow();
+        return accountRepository.findAccountByUserIdAndCurrencyCode(manager.getId(), code);
     }
     @Override
     public void buyManager(String code, BigDecimal amount){

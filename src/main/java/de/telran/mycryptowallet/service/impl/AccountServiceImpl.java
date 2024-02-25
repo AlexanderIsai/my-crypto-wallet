@@ -116,7 +116,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Optional<Account> getAccountByUserIdAndCurrency(Long userId, String code) {
+    public Account getAccountByUserIdAndCurrency(Long userId, String code) {
         userValidator.isUserNotFound(userService.getUserById(userId));
         return accountRepository.findAccountByUserIdAndCurrencyCode(userId, code);
     }

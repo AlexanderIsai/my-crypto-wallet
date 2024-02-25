@@ -91,7 +91,7 @@ class AccountBusinessServiceImplTest {
         Account account = new Account(1L, "address", user, currencyService.getCurrencyByCode(currencyCode), new BigDecimal("100000"), BigDecimal.ZERO);
 
         when(currencyService.getBasicCurrency()).thenReturn("USDT");
-        when(accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), currencyCode)).thenReturn(Optional.of(account));
+        when(accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), currencyCode)).thenReturn(account);
 
         accountBusinessService.reserveForOrder(user, currencyCode, operationType, amount, rate);
 
