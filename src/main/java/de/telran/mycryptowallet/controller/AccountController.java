@@ -33,18 +33,18 @@ public class AccountController {
 
 
     @PostMapping(value = "/add")
-    @Operation(summary = "Добавить новый счет", description = "Создает и сохраняет счет в БД в заданной валюте для активного пользователя")
+    @Operation(summary = "add new account", description = "Creates and saves an account in the database in the specified currency for the active user")
     public void addNewAccount(@RequestBody AccountAddDTO accountAddDTO) {
         accountService.addNewAccount(activeUserService.getActiveUser(), accountAddDTO.getCurrencyCode());
     }
 
     @GetMapping(value = "/my")
-    @Operation(summary = "Показать аккаунты активного пользователя", description = "Возвращает подробную информацию об аккаунтах активного пользователя")
+    @Operation(summary = "Show active user accounts", description = "Returns detailed information about the active user's accounts")
     public List<Account> showAccountsByUser() {
         return accountService.getAccountsByUser(activeUserService.getActiveUser().getId());
     }
     @GetMapping(value = "/user-currency")
-    @Operation(summary = "Показать аккаунт по пользователю и валюте", description = "Возвращает подробную информацию об аккаунте по пользователю и валюте")
+    @Operation(summary = "Show account by user and currency", description = "Returns detailed account information by user and currency")
     public Account showAccountByIdAndUserId(@RequestParam(name = "userId") Long userId, @RequestParam(name = "code") String code) {
         return accountService.getAccountByUserIdAndCurrency(userId, code).orElseThrow();
     }

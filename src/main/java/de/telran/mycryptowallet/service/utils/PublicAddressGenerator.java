@@ -19,7 +19,7 @@ public class PublicAddressGenerator {
 
     public String generatePublicAddress(String code){
         return switch (code) {
-            case "USDT" -> generateTetherAddress();
+            case "USDT", "ETH" -> generateTetherAddress();
             case "BTC" -> generateBitcoinAddress();
             default -> "";
         };

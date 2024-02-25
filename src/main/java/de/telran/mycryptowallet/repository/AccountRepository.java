@@ -112,4 +112,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
      * @return the found {@link Account} entity, wrapped in an {@link Optional}.
      */
     Optional<Account> findAccountByUserIdAndCurrencyCode(Long userId, String code);
+
+    @Query(nativeQuery = true, value = "SELECT SUM(balance + order_balance) FROM crypto_accounts WHERE currency = :code")
+    BigDecimal getSumAccountByCode(String code);
 }

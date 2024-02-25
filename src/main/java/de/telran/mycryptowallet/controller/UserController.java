@@ -1,4 +1,5 @@
 package de.telran.mycryptowallet.controller;
+import de.telran.mycryptowallet.dto.UserAddDTO;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.exceptions.EntityNotFoundException;
 import de.telran.mycryptowallet.service.interfaces.AccountService;
@@ -27,9 +28,9 @@ public class UserController {
 
     @PostMapping(value = "/add-new-user")
     @Operation(summary = "Создать нового пользователя", description = "Создает нового пользователя и все возможные счета для него")
-    public void save(@RequestBody @Valid User user) {
-        userService.addNewUser(user);
-        accountService.createUserAccounts(user);
+    public void save(@RequestBody @Valid UserAddDTO userAddDTO) {
+        userService.addNewUser(userAddDTO.getName(), userAddDTO.getEmail(), userAddDTO.getPassword());
+        accountService.createUserAccounts(userService.getUserByEmail(userAddDTO.getEmail()));
     }
 
     @GetMapping(value = "/{id}")
@@ -57,7 +58,7 @@ public class UserController {
     @GetMapping(value = "/email")
     @Operation(summary = "Получить пользователя по email", description = "Возвращает подробную информацию о пользователе по email")
     public ResponseEntity<User> showUserByEmail(@RequestParam(value = "email") String email) {
-        return ResponseEntity.ok(userService.getUserByEmail(email).orElseThrow());
+        return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
     @PutMapping(value = "/{id}")

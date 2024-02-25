@@ -3,6 +3,7 @@ package de.telran.mycryptowallet.service.interfaces;
 import de.telran.mycryptowallet.entity.Rate;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,7 +20,7 @@ public interface RateService {
      *
      * @return A map of currency codes to their corresponding rate details.
      */
-    Map<String, Object> getRate();
+    List<Map<String, Object>> getRate();
 
     /**
      * Adds a new rate to the system. The method specifics, including parameters and how

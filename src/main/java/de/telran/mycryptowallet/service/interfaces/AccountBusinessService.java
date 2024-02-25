@@ -7,6 +7,7 @@ import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * Provides business logic for account operations including deposits, withdrawals,

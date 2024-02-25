@@ -1,9 +1,7 @@
 package de.telran.mycryptowallet.service.impl;
 
-import de.telran.mycryptowallet.entity.Account;
-import de.telran.mycryptowallet.entity.Order;
-import de.telran.mycryptowallet.entity.TotalUserBalance;
-import de.telran.mycryptowallet.entity.User;
+import de.telran.mycryptowallet.entity.*;
+import de.telran.mycryptowallet.entity.Currency;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.entity.entityEnum.UserRole;
 import de.telran.mycryptowallet.repository.AccountRepository;
@@ -14,9 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * description
@@ -107,12 +103,15 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
 
         BigDecimal usdFrom = getUsdBalanceFromCryptoAccounts(accounts);
         BigDecimal usdBase = accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBasicCurrency()).orElseThrow().getBalance();
+        BigDecimal usdOrderBase = accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBasicCurrency()).orElseThrow().getOrderBalance();
+
         BigDecimal btcFrom = getBTCBalanceFromCryptoAccounts(accounts);
         BigDecimal btcFromUsd = getBTCBalanceFromUSDAccount(accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBasicCurrency()).orElseThrow());
         BigDecimal btcBase = accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBTCCurrency()).orElseThrow().getBalance();
+        BigDecimal btcOrderBase = accountService.getAccountByUserIdAndCurrency(userId, currencyService.getBTCCurrency()).orElseThrow().getOrderBalance();
 
-        totalUserBalance.setUsd(usdBase.add(usdFrom));
-        totalUserBalance.setBtc(btcBase.add(btcFrom).add(btcFromUsd));
+        totalUserBalance.setUsd(usdBase.add(usdFrom).add(usdOrderBase));
+        totalUserBalance.setBtc(btcBase.add(btcFrom).add(btcFromUsd).add(btcOrderBase));
         totalUserBalance.setUser(userService.getUserById(userId));
         return totalUserBalance;
     }
@@ -146,7 +145,7 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
         BigDecimal usdFrom = accounts.stream()
                 .filter(Objects::nonNull)
                 .filter(account -> !account.getCurrency().getCode().equals(currencyService.getBasicCurrency()))
-                .map(account -> account.getBalance().multiply(rateService.getFreshRate(account.getCurrency().getCode()).getBuyRate()))
+                .map(account -> account.getBalance().add(account.getOrderBalance()).multiply(rateService.getFreshRate(account.getCurrency().getCode()).getBuyRate()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return usdFrom;
     }
@@ -155,19 +154,19 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
         BigDecimal btcFrom = accounts.stream()
                 .filter(Objects::nonNull)
                 .filter(account -> !account.getCurrency().getCode().equals(currencyService.getBTCCurrency()) && !account.getCurrency().getCode().equals(currencyService.getBasicCurrency()))
-                .map(account -> account.getBalance().multiply(rateService.getFreshRate(account.getCurrency().getCode()).getBuyRate()).divide(rateService.getFreshRate(currencyService.getBTCCurrency()).getSellRate(), SCALE, RoundingMode.HALF_DOWN))
+                .map(account -> account.getBalance().add(account.getOrderBalance()).multiply(rateService.getFreshRate(account.getCurrency().getCode()).getBuyRate()).divide(rateService.getFreshRate(currencyService.getBTCCurrency()).getSellRate(), SCALE, RoundingMode.HALF_DOWN))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return btcFrom;
     }
 
     private BigDecimal getBTCBalanceFromUSDAccount(Account account){
-        return account.getBalance().divide(rateService.getFreshRate(currencyService.getBTCCurrency()).getSellRate(), SCALE, RoundingMode.HALF_DOWN);
+        return account.getBalance().add(account.getOrderBalance()).divide(rateService.getFreshRate(currencyService.getBTCCurrency()).getSellRate(), SCALE, RoundingMode.HALF_DOWN);
     }
 
     @Transactional
     @Override
     public TotalUserBalance showProfit() {
-        User manager = userService.getUserByEmail("manager@ukr.net").orElseThrow();
+        User manager = userService.getUserByEmail("manager@ukr.net");
         TotalUserBalance profit = new TotalUserBalance();
         BigDecimal usd = getTotalUserBalance(manager.getId()).getUsd().subtract(getTotalBalance().getUsd());
         BigDecimal btc = getTotalUserBalance(manager.getId()).getBtc().subtract(getTotalBalance().getBtc());

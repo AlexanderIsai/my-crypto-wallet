@@ -57,7 +57,7 @@ class AccountManagerServiceImplTest {
         managerAccount.setBalance(BigDecimal.ZERO);
         managerAccount.setOrderBalance(BigDecimal.ZERO);
 
-        when(userService.getUserByEmail("manager@ukr.net")).thenReturn(Optional.of(manager));
+        when(userService.getUserByEmail("manager@ukr.net")).thenReturn(manager);
         when(accountRepository.findAccountByUserIdAndCurrencyCode(manager.getId(), currencyCode)).thenReturn(Optional.of(managerAccount));
     }
 

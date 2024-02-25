@@ -35,8 +35,8 @@ public class TradeBotService {
 
     @PostConstruct
     public void init() {
-        MORNING_BUYER = userService.getUserByEmail("morning@buy.btc").orElseThrow();
-        EVENING_BUYER = userService.getUserByEmail("evening@buy.btc").orElseThrow();
+        MORNING_BUYER = userService.getUserByEmail("morning@buy.btc");
+        EVENING_BUYER = userService.getUserByEmail("evening@buy.btc");
     }
 
     @Scheduled(cron = "0 0 20 * * *")

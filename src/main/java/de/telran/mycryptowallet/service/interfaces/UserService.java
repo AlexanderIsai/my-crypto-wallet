@@ -12,11 +12,12 @@ import java.util.Optional;
  */
 public interface UserService {
     /**
-     * Adds a new user to the system.
-     *
-     * @param user The User entity to be added.
+     * Adds a new user to the system with the provided user name, email, and password.
+     * @param userName the user name for the new user, must be non-null
+     * @param email the email address for the new user, must be unique and follow a valid email format
+     * @param password the password for the new user, must meet the system's security requirements
      */
-    void addNewUser(User user);
+    void addNewUser(String userName, String email, String password);
 
     /**
      * Retrieves a user by their ID.
@@ -32,7 +33,7 @@ public interface UserService {
      * @param email The email address of the user.
      * @return An Optional containing the User entity if found, or an empty Optional otherwise.
      */
-    Optional<User> getUserByEmail(String email);
+    User getUserByEmail(String email);
 
     /**
      * Retrieves all users in the system.
