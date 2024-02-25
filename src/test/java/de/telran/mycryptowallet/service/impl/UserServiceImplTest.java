@@ -1,4 +1,5 @@
 package de.telran.mycryptowallet.service.impl;
+import de.telran.mycryptowallet.dto.UserAddDTO;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
 import de.telran.mycryptowallet.repository.UserRepository;
@@ -33,10 +34,11 @@ class UserServiceImplTest {
     @Test
     void addNewUser() {
         User user = new User();
-        user.setPassword("password");
+        UserAddDTO userAddDTO = new UserAddDTO("user", "test@telran.de", "password");
+        user.setPassword(userAddDTO.getPassword());
 
         when(passwordEncoder.encode(user.getPassword())).thenReturn("encodedPassword");
-        userService.addNewUser(user);
+        userService.addNewUser(userAddDTO.getName(), userAddDTO.getEmail(), userAddDTO.getPassword());
 
         verify(passwordEncoder).encode("password");
         verify(userRepository).save(any(User.class));
@@ -61,12 +63,11 @@ class UserServiceImplTest {
         String email = "test@telran.de";
         User mockUser = new User();
         mockUser.setEmail(email);
-        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(mockUser));
+        when(userRepository.findUserByEmail(email)).thenReturn(mockUser);
 
-        Optional<User> result = userService.getUserByEmail(email);
+        User result = userService.getUserByEmail(email);
 
-        assertTrue(result.isPresent());
-        assertEquals(email, result.get().getEmail());
+        assertEquals(email, result.getEmail());
         verify(userRepository).findUserByEmail(email);
     }
 

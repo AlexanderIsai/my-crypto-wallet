@@ -40,7 +40,7 @@ public class AccountManagerServiceImpl implements AccountManagerService {
     }
 
     private Account getManagerAccountByCurrency(String code) {
-        User manager = userService.getUserByEmail("manager@ukr.net").orElseThrow();
+        User manager = userService.getUserByEmail("manager@ukr.net");
         return accountRepository.findAccountByUserIdAndCurrencyCode(manager.getId(), code).orElseThrow();
     }
     @Override

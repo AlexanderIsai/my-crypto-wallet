@@ -19,9 +19,18 @@ public class RateGenerator {
     @Value("${url.bitcoin}")
     private  String bitcoinUrl;
 
+    @Value("${url.ethereum}")
+    private String ethereumUrl;
+
     public Map<String, Object> getBitcoinPrice() {
         RestTemplate restTemplate = new RestTemplate();
         String url = bitcoinUrl;
+        return restTemplate.getForObject(url, Map.class);
+    }
+
+    public Map<String, Object> geEthereumPrice() {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = ethereumUrl;
         return restTemplate.getForObject(url, Map.class);
     }
 

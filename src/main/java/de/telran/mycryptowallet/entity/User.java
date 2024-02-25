@@ -39,18 +39,13 @@ public class User implements UserDetails {
     @Column(name = "id")
     private Long id;
 
-    @NotEmpty(message = "Name should not be empty")
-    @Size(min = 2, max = 25, message = "Name should be between 2 and 25 letters")
     @Column(nullable = false, name = "name")
     private String userName;
 
-    @Email
-    @NotEmpty(message = "Email should not be empty")
     @Column(nullable = false, unique = true, name = "email")
     private String email;
 
     @Column(nullable = false, name = "password")
-    @Size(min = 4, max = 60, message = "Password should be between 4 and 60 symbols")
     private String password;
 
     @Column(nullable = false, name = "status")

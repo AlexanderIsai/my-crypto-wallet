@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,14 +49,19 @@ class RateServiceImplTest {
 
     @Test
     void getRateTest() {
-        Map<String, Object> expectedRate = new HashMap<>();
-        expectedRate.put("USD", Map.of("last", 50000));
-        when(rateGenerator.getBitcoinPrice()).thenReturn(expectedRate);
+        Map<String, Object> mockBtcRate = Map.of("currency", "BTC", "price", "50000");
+        Map<String, Object> mockEthRate = Map.of("currency", "ETH", "price", "4000");
+        when(rateGenerator.getBitcoinPrice()).thenReturn(mockBtcRate);
+        when(rateGenerator.geEthereumPrice()).thenReturn(mockEthRate);
 
-        Map<String, Object> result = rateService.getRate();
 
-        verify(rateGenerator, times(1)).getBitcoinPrice();
-        assert result.equals(expectedRate);
+        List<Map<String, Object>> result = rateService.getRate();
+
+
+        assertEquals(2, result.size(), "Должно быть две валюты");
+        assertEquals(mockBtcRate, result.get(0), "Первая валюта должна быть BTC");
+        assertEquals(mockEthRate, result.get(1), "Вторая валюта должна быть ETH");
+
     }
 
     @Test

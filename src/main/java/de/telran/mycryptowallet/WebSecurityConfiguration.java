@@ -43,8 +43,8 @@ public class WebSecurityConfiguration {
 
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository){
-        UserDetailsService userDetailsService = (username) -> {
-            User user = userRepository.findUserByUserName(username);
+        UserDetailsService userDetailsService = (email) -> {
+            User user = userRepository.findUserByEmail(email);
             if (user != null) {
                 return user;
             }
