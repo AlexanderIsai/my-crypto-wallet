@@ -33,7 +33,8 @@ Plan for upcoming updates:
 5. Add a method for calculating the maximum possible amount of cryptocurrency purchase by a user.
 6. Add the ability to buy/sell cryptocurrency for a specified % of the current account balance.
 7. Fix application bugs.
-8. Improve error and exception handling service.    
+8. Improve error and exception handling service.
+9. Adding basic frontend  
 
 Stages of development:
 1. initialization of the spring project.
