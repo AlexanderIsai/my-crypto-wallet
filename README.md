@@ -56,9 +56,3 @@ JPA, Hibernate, SQL, JPQL
 13. Creating unit and integration tests of the application.
 14. Creating application documentation using Javadoc
 
-Roadmap for developing and implementing application services:
-1. User Creation (DTO)
-2. Creating user accounts (happens automatically for all currencies of the application, when creating a user)
-3. Realization of exchange operations - replenish account balance, withdraw funds from the account, sell or buy cryptocurrency.
-4. Realization of documentation and saving of exchange operations.
-5. Realization of trading operations - creating an order to buy or sell cryptocurrency.
