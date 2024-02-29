@@ -42,7 +42,6 @@ public class TradeBotService {
     @Scheduled(cron = "0 0 20 * * *")
     public void eveningBuy(){
         buy(EVENING_BUYER);
-
     }
     @Scheduled(cron = "0 0 20 * * *")
     public void eveningSell(){

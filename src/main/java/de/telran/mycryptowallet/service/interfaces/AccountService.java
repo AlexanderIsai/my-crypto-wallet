@@ -3,7 +3,6 @@ import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.User;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * description
@@ -71,7 +70,7 @@ public interface AccountService {
      *
      * @param userId the user's ID
      * @param code the currency code
-     * @return an Optional containing the account if found
+     * @return an Account
      */
     Account getAccountByUserIdAndCurrency(Long userId, String code);
 

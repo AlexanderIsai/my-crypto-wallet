@@ -1,13 +1,11 @@
 package de.telran.mycryptowallet.repository;
-
 import de.telran.mycryptowallet.entity.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
+
 
 
 /**
@@ -109,7 +107,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
      *
      * @param userId the ID of the user.
      * @param code the code of the currency.
-     * @return the found {@link Account} entity, wrapped in an {@link Optional}.
+     * @return the found {@link Account} entity.
      */
     Account findAccountByUserIdAndCurrencyCode(Long userId, String code);
 

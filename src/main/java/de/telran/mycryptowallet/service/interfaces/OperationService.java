@@ -1,14 +1,10 @@
 package de.telran.mycryptowallet.service.interfaces;
-
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Operation;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
-import de.telran.mycryptowallet.exceptions.NotEnoughFundsException;
-
 import java.math.BigDecimal;
-import java.util.Optional;
 
 /**
  * Defines the operations related to financial transactions within the cryptocurrency wallet application.
@@ -68,6 +64,6 @@ public interface OperationService {
     void transfer(Account from, Account to, BigDecimal amount);
     //TODO добавить админские методы (статистика и т.п.)
 
-    Optional<Operation> getOperationById(Long id);
+    Operation getOperationById(Long id);
 
 }

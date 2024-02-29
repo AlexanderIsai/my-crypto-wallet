@@ -1,12 +1,9 @@
 package de.telran.mycryptowallet.repository;
-
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Interface for CRUD operations on a repository for the {@link User} type.
@@ -28,18 +25,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findUserById(Long id);
 
     /**
-     * Finds a user by their username.
-     *
-     * @param username The username of the user to find.
-     * @return The found user.
-     */
-    User findUserByUserName(String username);
-
-    /**
      * Finds a user by their email.
      *
      * @param email The email of the user to find.
-     * @return An {@link Optional} containing the found user if they exist.
+     * @return An {@link User}.
      */
     User findUserByEmail(String email);
 

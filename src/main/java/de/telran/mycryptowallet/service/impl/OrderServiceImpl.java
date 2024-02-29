@@ -133,13 +133,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void cancelOrder(Long orderId) {
         Order order = orderRepository.findOrderById(orderId);
+        orderValidator.isOrderActive(order);
         order.setStatus(OrderStatus.CANCELLED);
         Account orderAccount = accountBusinessService.getAccountFromOrder(order);
 
         BigDecimal orderAmount = getOrderAmount(order);
         orderAccount.setOrderBalance(orderAccount.getOrderBalance().subtract(orderAmount));
         orderAccount.setBalance(orderAccount.getBalance().add(orderAmount));
-        System.out.println(orderAccount);
         accountService.updateAccount(orderAccount.getId(), orderAccount);
         updateOrder(orderId, order);
     }
@@ -163,5 +163,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public BigDecimal getOrderAmount(Order order) {
         return order.getType().equals(OperationType.BUY) ? order.getAmount().multiply(order.getRateValue()) : order.getAmount();
+    }
+
+    @Override
+    public void cancelAllOrders(){
+        orderRepository.getAllOrders().forEach(order -> cancelOrder(order.getId()));
     }
 }
