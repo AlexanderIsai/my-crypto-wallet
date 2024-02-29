@@ -41,4 +41,6 @@ public interface OrderService {
 
     BigDecimal getOrderAmount(Order order);
 
+    void cancelAllOrders();
+
 }

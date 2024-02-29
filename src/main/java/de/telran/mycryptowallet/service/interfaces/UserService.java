@@ -2,7 +2,7 @@ package de.telran.mycryptowallet.service.interfaces;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
 import java.util.List;
-import java.util.Optional;
+
 
 /**
  * description
@@ -31,7 +31,7 @@ public interface UserService {
      * Retrieves a user by their email address.
      *
      * @param email The email address of the user.
-     * @return An Optional containing the User entity if found, or an empty Optional otherwise.
+     * @return the User entity.
      */
     User getUserByEmail(String email);
 

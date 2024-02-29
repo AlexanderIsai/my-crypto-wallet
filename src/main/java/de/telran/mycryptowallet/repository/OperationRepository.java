@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Repository interface for handling CRUD operations for {@link Operation} entities in the database.
@@ -34,9 +33,9 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
      * Finds an operation by its unique identifier.
      *
      * @param id the ID of the operation.
-     * @return an {@link Optional} containing the found {@link Operation} or an empty Optional if not found.
+     * @return an {@link Operation}.
      */
-    Optional<Operation> findOperationById(Long id);
+    Operation findOperationById(Long id);
 
     /**
      * Finds operations associated with a specific user ID.

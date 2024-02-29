@@ -1,25 +1,16 @@
 package de.telran.mycryptowallet.service.impl;
-import de.telran.mycryptowallet.dto.AccountAddDTO;
-import de.telran.mycryptowallet.dto.OrderAddDTO;
 import de.telran.mycryptowallet.entity.Account;
-import de.telran.mycryptowallet.entity.Order;
-import de.telran.mycryptowallet.entity.TotalUserBalance;
 import de.telran.mycryptowallet.entity.User;
-import de.telran.mycryptowallet.entity.entityEnum.OperationType;
-import de.telran.mycryptowallet.exceptions.ExistAccountException;
 import de.telran.mycryptowallet.repository.AccountRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
-import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
 import de.telran.mycryptowallet.service.utils.PublicAddressGenerator;
 import de.telran.mycryptowallet.service.utils.validators.UserValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+
 
 @RequiredArgsConstructor
 @Service
