@@ -17,14 +17,6 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
-     * Finds a user by their ID.
-     *
-     * @param id The ID of the user to find.
-     * @return The found user.
-     */
-    User findUserById(Long id);
-
-    /**
      * Finds a user by their email.
      *
      * @param email The email of the user to find.
@@ -56,13 +48,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return True if a user with the given ID and status exists, false otherwise.
      */
     Boolean existsUserByIdAndStatus(Long id, UserStatus status);
-
-    /**
-     * Retrieves all users from the database.
-     *
-     * @return A list of all users.
-     */
-    @Query(nativeQuery = true, value = "SELECT * FROM crypto_users")
-    List<User> getAllUsers();
 
 }

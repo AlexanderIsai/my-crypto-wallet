@@ -21,14 +21,6 @@ import java.util.List;
 public interface RateRepository extends JpaRepository<Rate, Long> {
 
     /**
-     * Retrieves all currency rates from the database.
-     *
-     * @return a list of {@link Rate}.
-     */
-    @Query(nativeQuery = true, value = "SELECT * FROM crypto_rates")
-    List<Rate> getAllRates();
-
-    /**
      * Finds rates by their associated currency code.
      *
      * @param code the currency code.

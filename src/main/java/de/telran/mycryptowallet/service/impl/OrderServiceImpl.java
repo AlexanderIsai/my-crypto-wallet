@@ -61,7 +61,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> getAllOrders() {
-        return orderRepository.getAllOrders();
+        return orderRepository.findAll();
     }
 
     @Override
@@ -77,7 +77,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order getOrderById(Long id) {
-        return orderRepository.findOrderById(id);
+        return orderRepository.findById(id).orElseThrow();
     }
 
     private BigDecimal calculateTransferAmount(Order order, Account executorOrderAccount, Account executorBasicAccount) {
@@ -132,7 +132,7 @@ public class OrderServiceImpl implements OrderService {
     }
     @Override
     public void cancelOrder(Long orderId) {
-        Order order = orderRepository.findOrderById(orderId);
+        Order order = orderRepository.findById(orderId).orElseThrow();
         orderValidator.isOrderActive(order);
         order.setStatus(OrderStatus.CANCELLED);
         Account orderAccount = accountBusinessService.getAccountFromOrder(order);
@@ -167,6 +167,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void cancelAllOrders(){
-        orderRepository.getAllOrders().forEach(order -> cancelOrder(order.getId()));
+        orderRepository.findAll().forEach(order -> cancelOrder(order.getId()));
     }
 }

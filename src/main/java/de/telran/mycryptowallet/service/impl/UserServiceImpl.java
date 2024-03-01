@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long id) {
-        User user = userRepository.findUserById(id);
+        User user = userRepository.findById(id).orElseThrow();
         userValidator.isUserNotFound(user);
         return user;
     }
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAllUsers() {
-        return userRepository.getAllUsers();
+        return userRepository.findAll();
     }
 
     @Override

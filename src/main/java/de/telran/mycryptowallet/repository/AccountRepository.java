@@ -20,15 +20,6 @@ import java.util.List;
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
     /**
-     * Retrieves all account entities from the database.
-     *
-     * @return a list of all {@link Account} entities.
-     */
-    @Query(nativeQuery = true, value = "SELECT * FROM crypto_accounts")
-    List<Account> getAllAccounts();
-
-
-    /**
      * Finds accounts belonging to a specific user.
      *
      * @param userId the ID of the user.
@@ -43,15 +34,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
      * @return a list of matching {@link Account} entities.
      */
     List<Account> findAccountsByCurrencyCode(String code);
-
-    /**
-     * Finds an account by its unique ID.
-     *
-     * @param id the ID of the account.
-     * @return the found {@link Account} entity.
-     */
-    Account findAccountById(Long id);
-
     /**
      * Finds an account by its public address.
      *

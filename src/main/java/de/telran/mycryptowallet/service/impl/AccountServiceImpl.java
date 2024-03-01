@@ -41,7 +41,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<Account> getAllAccounts() {
-        return accountRepository.getAllAccounts();
+        return accountRepository.findAll();
     }
 
     @Override
@@ -62,7 +62,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account getAccountById(Long id) {
-        return accountRepository.findAccountById(id);
+        return accountRepository.findById(id).orElseThrow();
     }
 
     @Override
@@ -98,7 +98,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public void resetAllAccounts() {
-        List<Account> accounts = accountRepository.getAllAccounts();
+        List<Account> accounts = accountRepository.findAll();
         accounts.forEach(account -> {
             account.setBalance(BigDecimal.ZERO);
             account.setOrderBalance(BigDecimal.ZERO);

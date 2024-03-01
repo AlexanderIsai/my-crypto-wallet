@@ -22,22 +22,6 @@ import java.util.List;
 public interface OperationRepository extends JpaRepository<Operation, Long> {
 
     /**
-     * Retrieves all operations stored in the database.
-     *
-     * @return a list of all {@link Operation} entities.
-     */
-    @Query(nativeQuery = true, value = "SELECT * FROM crypto_operations")
-    List<Operation> getAllOperations();
-
-    /**
-     * Finds an operation by its unique identifier.
-     *
-     * @param id the ID of the operation.
-     * @return an {@link Operation}.
-     */
-    Operation findOperationById(Long id);
-
-    /**
      * Finds operations associated with a specific user ID.
      *
      * @param userId the ID of the user.

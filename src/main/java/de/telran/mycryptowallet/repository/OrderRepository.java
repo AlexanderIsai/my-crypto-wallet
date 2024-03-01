@@ -21,21 +21,6 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     /**
-     * Retrieves all orders from the database.
-     *
-     * @return a list of all {@link Order}.
-     */
-    @Query(nativeQuery = true, value = "SELECT * FROM crypto_orders")
-    List<Order> getAllOrders();
-
-    /**
-     * Finds an order by its ID.
-     * @param id the ID of the order.
-     * @return the {@link Order} with the specified ID.
-     */
-    Order findOrderById(Long id);
-
-    /**
      * Finds orders associated with a specific user ID.
      * @param userId the user's ID.
      * @return a list of {@link Order} belonging to the specified user.

@@ -16,15 +16,6 @@ import java.util.List;
  * @version 18.01.2024
  */
 public interface CurrencyRepository extends JpaRepository<Currency, Long> {
-
-    /**
-     * Retrieves all currency entities from the database.
-     *
-     * @return a list of all {@link Currency} entities.
-     */
-    @Query(nativeQuery = true, value = "SELECT * FROM crypto_currencies")
-    List<Currency> getAllCurrencies();
-
     /**
      * Checks if a currency exists by its unique code.
      *

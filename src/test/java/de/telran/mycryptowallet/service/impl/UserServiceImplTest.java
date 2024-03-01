@@ -11,6 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -48,13 +50,13 @@ class UserServiceImplTest {
         Long userId = 1L;
         User mockUser = new User();
         mockUser.setId(userId);
-        when(userRepository.findUserById(userId)).thenReturn(mockUser);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
 
         User result = userService.getUserById(userId);
 
         assertNotNull(result);
         assertEquals(userId, result.getId());
-        verify(userRepository).findUserById(userId);
+        verify(userRepository).findById(userId);
     }
 
     @Test
@@ -73,14 +75,14 @@ class UserServiceImplTest {
     @Test
     void getAllUsers() {
         List<User> mockUsers = Arrays.asList(new User(), new User(), new User());
-        when(userRepository.getAllUsers()).thenReturn(mockUsers);
+        when(userRepository.findAll()).thenReturn(mockUsers);
 
         List<User> result = userService.getAllUsers();
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
         assertEquals(3, result.size());
-        verify(userRepository).getAllUsers();
+        verify(userRepository).findAll();
     }
 
     @Test
@@ -137,7 +139,7 @@ class UserServiceImplTest {
         user.setId(userId);
         user.setStatus(UserStatus.ONLINE);
 
-        when(userRepository.findUserById(userId)).thenReturn(user);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         userService.toggleBlockUser(userId);
 

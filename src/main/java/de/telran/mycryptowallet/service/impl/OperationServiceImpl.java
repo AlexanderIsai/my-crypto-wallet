@@ -110,6 +110,6 @@ public class OperationServiceImpl implements OperationService {
 
     @Override
     public Operation getOperationById(Long id) {
-        return operationRepository.findOperationById(id);
+        return operationRepository.findById(id).orElseThrow();
     }
 }
