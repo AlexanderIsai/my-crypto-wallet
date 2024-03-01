@@ -27,6 +27,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query(nativeQuery = true, value = "SELECT * FROM crypto_accounts")
     List<Account> getAllAccounts();
 
+
     /**
      * Finds accounts belonging to a specific user.
      *

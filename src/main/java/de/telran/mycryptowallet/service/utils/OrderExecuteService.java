@@ -6,16 +6,14 @@ import de.telran.mycryptowallet.service.interfaces.AccountService;
 import de.telran.mycryptowallet.service.interfaces.OperationService;
 import de.telran.mycryptowallet.service.interfaces.OrderService;
 import de.telran.mycryptowallet.service.interfaces.RateService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * description
@@ -32,68 +30,47 @@ public class OrderExecuteService {
     private final AccountService accountService;
     private final OperationService operationService;
 
-
+    @Scheduled(cron = "0 */6 * * * *")
+    public void executeBuyOrders() {
+        List<Order> ordersBuy = orderService.getOrdersByStatusAndType(OrderStatus.ACTIVE, OperationType.BUY);
+        executeOrders(ordersBuy, OperationType.BUY);
+    }
 
     @Scheduled(cron = "0 */6 * * * *")
-    public void executeBuyOrders(){
-        List<Order> ordersBuy = orderService.getOrdersByStatusAndType(OrderStatus.ACTIVE, OperationType.BUY);
-        for (Order order : ordersBuy) {
-            if (order.getRateValue().compareTo(rateService.getFreshRate(order.getCurrency().getCode()).getSellRate()) >= 0){
-                Operation operation = new Operation();
+    @Transactional
+    public void executeSellOrders() {
+        List<Order> ordersSell = orderService.getOrdersByStatusAndType(OrderStatus.ACTIVE, OperationType.SELL);
+        executeOrders(ordersSell, OperationType.SELL);
+    }
 
-                User user = order.getUser();
-                operation.setUser(user);
+    private void executeOrders(List<Order> orders, OperationType operationType) {
+        for (Order order : orders) {
+            Rate currentRate = rateService.getFreshRate(order.getCurrency().getCode());
+            BigDecimal targetRate = operationType == OperationType.BUY ? currentRate.getSellRate() : currentRate.getBuyRate();
 
-                operation.setCurrency(order.getCurrency());
-
-                Account account = accountService.getAccountByUserIdAndCurrency(user.getId(), order.getCurrency().getCode());
-                operation.setAccount(account);
-
-                Rate rate = rateService.getFreshRate(order.getCurrency().getCode());
-                operation.setRateValue(rate.getSellRate());
-
-                operation.setAmount(order.getAmount());
-
-                operation.setType(OperationType.BUY);
-
-                orderService.cancelOrder(order.getId());
-                order.setStatus(OrderStatus.AUTO);
-                orderService.updateOrder(order.getId(), order);
-                operationService.cashFlow(operation);
+            if ((operationType == OperationType.BUY && order.getRateValue().compareTo(targetRate) >= 0) ||
+                    (operationType == OperationType.SELL && order.getRateValue().compareTo(targetRate) <= 0)) {
+                performOrderOperation(order, operationType, targetRate);
             }
         }
     }
-    @Scheduled(cron = "0 */6 * * * *")
-    @Transactional
-    public void executeSellOrders(){
-        List<Order> ordersSell = orderService.getOrdersByStatusAndType(OrderStatus.ACTIVE, OperationType.SELL);
-        for (Order order : ordersSell) {
-            if (order.getRateValue().compareTo(rateService.getFreshRate(order.getCurrency().getCode()).getBuyRate()) <= 0){
-                Operation operation = new Operation();
 
-                User user = order.getUser();
-                operation.setUser(user);
+    private void performOrderOperation(Order order, OperationType operationType, BigDecimal rateValue) {
+        Operation operation = new Operation();
 
-                operation.setCurrency(order.getCurrency());
+        User user = order.getUser();
+        operation.setUser(user);
+        operation.setCurrency(order.getCurrency());
 
-                Account account = accountService.getAccountByUserIdAndCurrency(user.getId(), order.getCurrency().getCode());
-                operation.setAccount(account);
+        Account account = accountService.getAccountByUserIdAndCurrency(user.getId(), order.getCurrency().getCode());
+        operation.setAccount(account);
+        operation.setRateValue(rateValue);
+        operation.setAmount(order.getAmount());
+        operation.setType(operationType);
 
-                Rate rate = rateService.getFreshRate(order.getCurrency().getCode());
-                operation.setRateValue(rate.getBuyRate());
-
-                operation.setAmount(order.getAmount());
-
-                operation.setType(OperationType.SELL);
-
-                orderService.cancelOrder(order.getId());
-
-                order.setStatus(OrderStatus.AUTO);
-
-                orderService.updateOrder(order.getId(), order);
-
-                operationService.cashFlow(operation);
-            }
-        }
+        orderService.cancelOrder(order.getId());
+        order.setStatus(OrderStatus.AUTO);
+        orderService.updateOrder(order.getId(), order);
+        operationService.cashFlow(operation);
     }
 }

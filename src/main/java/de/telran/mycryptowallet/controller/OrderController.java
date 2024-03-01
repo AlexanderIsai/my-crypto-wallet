@@ -104,7 +104,7 @@ public class OrderController {
      * @param showDTO Data Transfer Object containing the request criteria.
      * @return List of orders matching the request criteria.
      */
-    @GetMapping(value = "/by-request")
+    @PostMapping(value = "/by-request")
     @Operation(summary = "Show all orders by request", description = "Returns detailed information about warrants for a given request")
     public List<Order> showOrderByRequest(@RequestBody OrderShowDTO showDTO){
         return orderService.getOrdersByStatusTypeCurrency(showDTO.getOrderStatus(), showDTO.getOperationType(), showDTO.getCurrencyCode());
