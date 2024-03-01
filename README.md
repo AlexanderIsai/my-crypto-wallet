@@ -3,7 +3,7 @@ The crypto wallet for storing cryptocurrency, exchanging it, and buying and sell
 The main goal of the project is to provide users with a secure, convenient and functional tool for storing, exchanging and trading cryptocurrencies.
 
 A roadmap for the design and implementation of application services:
-1. User Creation (DTO).
+1. User Creation.
 2. Connection of authorization, authentication and password encryption method.
 3. Creating the password change method.
 4. Adding basic cryptocurrencies - Bitcoin, Tether.
