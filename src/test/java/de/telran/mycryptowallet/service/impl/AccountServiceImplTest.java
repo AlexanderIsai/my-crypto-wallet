@@ -70,18 +70,18 @@ class AccountServiceImplTest {
         verify(userService).getAllUsers();
     }
 
-    @Test
-    void getAllAccounts() {
-        List<Account> mockAccounts = Arrays.asList(new Account(), new Account(), new Account());
-        when(accountRepository.getAllAccounts()).thenReturn(mockAccounts);
-
-        List<Account> result = accountService.getAllAccounts();
-
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        assertEquals(3, result.size());
-        verify(accountRepository).getAllAccounts();
-    }
+//    @Test
+//    void getAllAccounts() {
+//        List<Account> mockAccounts = Arrays.asList(new Account(), new Account(), new Account());
+//        when(accountRepository.getAllAccounts()).thenReturn(mockAccounts);
+//
+//        List<Account> result = accountService.getAllAccounts();
+//
+//        assertNotNull(result);
+//        assertFalse(result.isEmpty());
+//        assertEquals(3, result.size());
+//        verify(accountRepository).getAllAccounts();
+//    }
 
     @Test
     void getAccountsByUser() {

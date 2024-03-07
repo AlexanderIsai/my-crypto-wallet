@@ -1,7 +1,9 @@
 package de.telran.mycryptowallet.controller;
-import de.telran.mycryptowallet.dto.UserAddDTO;
+import de.telran.mycryptowallet.dto.userDTO.UserAddDTO;
+import de.telran.mycryptowallet.dto.userDTO.UserOutDTO;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.exceptions.EntityNotFoundException;
+import de.telran.mycryptowallet.mapper.userMapper.UserMapper;
 import de.telran.mycryptowallet.service.interfaces.AccountService;
 import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
 import de.telran.mycryptowallet.service.interfaces.UserService;
@@ -28,6 +30,7 @@ public class UserController {
     private final UserService userService;
     private final ActiveUserService activeUserService;
     private final AccountService accountService;
+    private final UserMapper userMapper;
 
     /**
      * Creates a new user along with all possible accounts for that user.
@@ -37,7 +40,7 @@ public class UserController {
     @PostMapping(value = "/add-new-user")
     @Operation(summary = "Add new user", description = "Creates a new user and all possible accounts for that user")
     public void save(@RequestBody @Valid UserAddDTO userAddDTO) {
-        userService.addNewUser(userAddDTO.getName(), userAddDTO.getEmail(), userAddDTO.getPassword());
+        userService.addNewUser(userAddDTO);
         accountService.createUserAccounts(userService.getUserByEmail(userAddDTO.getEmail()));
     }
 
@@ -49,10 +52,11 @@ public class UserController {
      */
     @GetMapping(value = "/{id}")
     @Operation(summary = "Show user by ID", description = "Returns detailed information about the user by their unique identifier")
-    public ResponseEntity<User> showUserById(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<UserOutDTO> showUserById(@PathVariable(value = "id") Long id) {
         User user = userService.getUserById(id);
+        UserOutDTO userOutDTO = userMapper.toDto(user);
         if (user != null) {
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(userOutDTO);
         } else {
             throw new EntityNotFoundException("User is not found");
         }
@@ -65,10 +69,11 @@ public class UserController {
      */
     @GetMapping(value = "/active-user")
     @Operation(summary = "Show active user", description = "Returns detailed information about the active user")
-    public ResponseEntity<User> getActiveUser() {
+    public ResponseEntity<UserOutDTO> getActiveUser() {
         User user = activeUserService.getActiveUser();
+        UserOutDTO userOutDTO = userMapper.toDto(user);
         if (user != null) {
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(userOutDTO);
         } else {
             throw new EntityNotFoundException("User is not found");
         }
@@ -82,8 +87,14 @@ public class UserController {
      */
     @GetMapping(value = "/email")
     @Operation(summary = "Show user by e-mail", description = "Returns detailed information about the user by e-mail")
-    public ResponseEntity<User> showUserByEmail(@RequestParam(value = "email") String email) {
-        return ResponseEntity.ok(userService.getUserByEmail(email));
+    public ResponseEntity<UserOutDTO> showUserByEmail(@RequestParam(value = "email") String email) {
+        User user = userService.getUserByEmail(email);
+        UserOutDTO userOutDTO = userMapper.toDto(user);
+        if (user != null) {
+            return ResponseEntity.ok(userOutDTO);
+        } else {
+            throw new EntityNotFoundException("User is not found");
+        }
     }
 
     /**

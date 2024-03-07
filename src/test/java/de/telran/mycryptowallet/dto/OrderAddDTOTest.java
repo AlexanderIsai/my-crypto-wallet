@@ -1,4 +1,5 @@
 package de.telran.mycryptowallet.dto;
+import de.telran.mycryptowallet.dto.orderDTO.OrderAddDTO;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import org.junit.jupiter.api.Test;
 
@@ -17,12 +18,12 @@ class OrderAddDTOTest {
         BigDecimal expectedOrderRate = new BigDecimal("50000.00");
 
         dto.setCurrencyCode(expectedCurrencyCode);
-        dto.setOperationType(expectedOperationType);
+        dto.setType(expectedOperationType);
         dto.setAmount(expectedAmount);
         dto.setOrderRate(expectedOrderRate);
 
         assertEquals(expectedCurrencyCode, dto.getCurrencyCode());
-        assertEquals(expectedOperationType, dto.getOperationType());
+        assertEquals(expectedOperationType, dto.getType());
         assertEquals(expectedAmount, dto.getAmount());
         assertEquals(expectedOrderRate, dto.getOrderRate());
     }
@@ -31,19 +32,19 @@ class OrderAddDTOTest {
     void testEqualsAndHashCode() {
         OrderAddDTO dto1 = new OrderAddDTO();
         dto1.setCurrencyCode("BTC");
-        dto1.setOperationType(OperationType.BUY);
+        dto1.setType(OperationType.BUY);
         dto1.setAmount(new BigDecimal("100"));
         dto1.setOrderRate(new BigDecimal("50000"));
 
         OrderAddDTO dto2 = new OrderAddDTO();
         dto2.setCurrencyCode("BTC");
-        dto2.setOperationType(OperationType.BUY);
+        dto2.setType(OperationType.BUY);
         dto2.setAmount(new BigDecimal("100"));
         dto2.setOrderRate(new BigDecimal("50000"));
 
         OrderAddDTO dto3 = new OrderAddDTO();
         dto3.setCurrencyCode("BTC");
-        dto3.setOperationType(OperationType.SELL);
+        dto3.setType(OperationType.SELL);
         dto3.setAmount(new BigDecimal("50"));
         dto3.setOrderRate(new BigDecimal("1500"));
 
@@ -58,7 +59,7 @@ class OrderAddDTOTest {
     void testToString() {
         OrderAddDTO dto = new OrderAddDTO();
         dto.setCurrencyCode("BTC");
-        dto.setOperationType(OperationType.BUY);
+        dto.setType(OperationType.BUY);
         dto.setAmount(new BigDecimal("100"));
         dto.setOrderRate(new BigDecimal("50000"));
 

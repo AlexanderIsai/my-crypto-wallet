@@ -1,4 +1,5 @@
 package de.telran.mycryptowallet.service.interfaces;
+import de.telran.mycryptowallet.dto.userDTO.UserAddDTO;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
 import java.util.List;
@@ -13,11 +14,11 @@ import java.util.List;
 public interface UserService {
     /**
      * Adds a new user to the system with the provided user name, email, and password.
-     * @param userName the user name for the new user, must be non-null
-     * @param email the email address for the new user, must be unique and follow a valid email format
-     * @param password the password for the new user, must meet the system's security requirements
+//     * @param userName the user name for the new user, must be non-null
+//     * @param email the email address for the new user, must be unique and follow a valid email format
+//     * @param password the password for the new user, must meet the system's security requirements
      */
-    void addNewUser(String userName, String email, String password);
+    void addNewUser(UserAddDTO userAddDTO);
 
     /**
      * Retrieves a user by their ID.

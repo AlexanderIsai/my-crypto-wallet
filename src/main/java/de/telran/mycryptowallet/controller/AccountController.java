@@ -1,7 +1,9 @@
 package de.telran.mycryptowallet.controller;
-import de.telran.mycryptowallet.dto.AccountAddDTO;
+import de.telran.mycryptowallet.dto.accountDTO.AccountAddDTO;
+import de.telran.mycryptowallet.dto.accountDTO.AccountOutDTO;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.TotalUserBalance;
+import de.telran.mycryptowallet.mapper.accountMapper.AccountMapper;
 import de.telran.mycryptowallet.service.interfaces.AccountBusinessService;
 import de.telran.mycryptowallet.service.interfaces.AccountService;
 import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
@@ -31,6 +33,7 @@ public class AccountController {
     private final AccountService accountService;
     private final ActiveUserService activeUserService;
     private final AccountBusinessService accountBusinessService;
+    private final AccountMapper accountMapper;
 
     /**
      * Creates and saves a new account in the specified currency for the active user.
@@ -50,8 +53,8 @@ public class AccountController {
      */
     @GetMapping(value = "/my")
     @Operation(summary = "Show active user accounts", description = "Returns detailed information about the active user's accounts.")
-    public List<Account> showAccountsByUser() {
-        return accountService.getAccountsByUser(activeUserService.getActiveUser().getId());
+    public List<AccountOutDTO> showAccountsByUser() {
+        return accountMapper.toDtoList(accountService.getAccountsByUser(activeUserService.getActiveUser().getId()));
     }
 
     /**
@@ -63,9 +66,9 @@ public class AccountController {
      */
     @GetMapping(value = "/user-currency")
     @Operation(summary = "Show account by user and currency", description = "Returns detailed account information by user and currency.")
-    public ResponseEntity<Account> showAccountByIdAndUserId(@RequestParam(name = "userId") Long userId, @RequestParam(name = "code") String code) {
+    public ResponseEntity<AccountOutDTO> showAccountByCurrencyAndUserId(@RequestParam(name = "userId") Long userId, @RequestParam(name = "code") String code) {
         Account account = accountService.getAccountByUserIdAndCurrency(userId, code);
-        return account != null ? ResponseEntity.ok(account) : ResponseEntity.notFound().build();
+        return account != null ? ResponseEntity.ok(accountMapper.toDto(account)) : ResponseEntity.notFound().build();
     }
 
     /**

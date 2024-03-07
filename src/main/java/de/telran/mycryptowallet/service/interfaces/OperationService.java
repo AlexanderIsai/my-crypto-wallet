@@ -1,9 +1,10 @@
 package de.telran.mycryptowallet.service.interfaces;
+import de.telran.mycryptowallet.dto.operationDTO.OperationAddDTO;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Operation;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.User;
-import de.telran.mycryptowallet.entity.entityEnum.OperationType;
+
 import java.math.BigDecimal;
 
 /**
@@ -16,12 +17,10 @@ public interface OperationService {
      * Creates and returns an exchange operation for a user involving a specific cryptocurrency.
      *
      * @param user The user performing the exchange operation.
-     * @param code The code of the cryptocurrency involved.
-     * @param amount The amount of cryptocurrency to be exchanged.
-     * @param type The type of exchange operation (BUY or SELL).
+     * @param operationAddDTO (currency code, amount, operation Type)
      * @return An Operation object representing the exchange operation.
      */
-    Operation getExchangeOperation(User user, String code, BigDecimal amount, OperationType type);
+    Operation getExchangeOperation(User user, OperationAddDTO operationAddDTO);
 
     /**
      * Processes an order operation between the order owner and the order executor.

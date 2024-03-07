@@ -1,4 +1,4 @@
-package de.telran.mycryptowallet.dto;
+package de.telran.mycryptowallet.dto.userDTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;

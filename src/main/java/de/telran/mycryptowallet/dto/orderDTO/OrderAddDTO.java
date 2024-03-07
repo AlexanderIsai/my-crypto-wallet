@@ -1,11 +1,12 @@
-package de.telran.mycryptowallet.dto;
+package de.telran.mycryptowallet.dto.orderDTO;
 
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
-import de.telran.mycryptowallet.entity.entityEnum.OrderStatus;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
@@ -19,6 +20,8 @@ import java.math.BigDecimal;
  * @version 25.01.2024
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderAddDTO {
 
     /**
@@ -31,7 +34,7 @@ public class OrderAddDTO {
      * The type of operation for the order (e.g., BUY, SELL). Cannot be null.
      */
     @NotNull(message = "Operation type is required.")
-    private OperationType operationType;
+    private OperationType type;
 
     /**
      * The amount of currency to be processed in the order. Must be a positive value.

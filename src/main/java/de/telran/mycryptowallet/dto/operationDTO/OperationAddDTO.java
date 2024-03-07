@@ -1,10 +1,12 @@
-package de.telran.mycryptowallet.dto;
+package de.telran.mycryptowallet.dto.operationDTO;
 
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
@@ -21,6 +23,8 @@ import java.math.BigDecimal;
  * @version 24.01.2024
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class OperationAddDTO {
 
     /**

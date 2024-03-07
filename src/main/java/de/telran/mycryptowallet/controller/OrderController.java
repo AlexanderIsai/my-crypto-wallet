@@ -1,8 +1,10 @@
 package de.telran.mycryptowallet.controller;
-import de.telran.mycryptowallet.dto.OrderAddDTO;
-import de.telran.mycryptowallet.dto.OrderShowDTO;
+import de.telran.mycryptowallet.dto.orderDTO.OrderAddDTO;
+import de.telran.mycryptowallet.dto.orderDTO.OrderOutDTO;
+import de.telran.mycryptowallet.dto.orderDTO.OrderShowDTO;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.entityEnum.OrderStatus;
+import de.telran.mycryptowallet.mapper.orderMapper.OrderMapper;
 import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
 import de.telran.mycryptowallet.service.interfaces.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +28,7 @@ public class OrderController {
 
     private final OrderService orderService;
     private final ActiveUserService activeUserService;
+    private final OrderMapper orderMapper;
 
     /**
      * Endpoint for creating a new order. It captures the order details from the request body
@@ -36,8 +39,7 @@ public class OrderController {
     @PostMapping(value = "/add")
     @Operation(summary = "Add new order", description = "Create new order")
     public void addNewOrder(@RequestBody OrderAddDTO orderAddDTO) {
-        orderService.addOrder(activeUserService.getActiveUser(), orderAddDTO.getCurrencyCode(), orderAddDTO.getOperationType(),
-                orderAddDTO.getAmount(), orderAddDTO.getOrderRate());
+        orderService.addOrder(activeUserService.getActiveUser(), orderAddDTO);
     }
     /**
      * Endpoint to retrieve all orders in the system. It returns a list of orders without filtering.
@@ -46,8 +48,8 @@ public class OrderController {
      */
     @GetMapping(value = "/all-orders")
     @Operation(summary = "Show all orders", description = "Shows information about all orders")
-    public List<Order> showAllOrders(){
-        return orderService.getAllOrders();
+    public List<OrderOutDTO> showAllOrders(){
+        return orderMapper.toDtoList(orderService.getAllOrders());
     }
     /**
      * Endpoint to fetch a specific order by its ID. It returns the order details if found,
@@ -58,10 +60,10 @@ public class OrderController {
      */
     @GetMapping(value = "/{id}")
     @Operation(summary = "Show order by ID", description = "Returns order information by ID")
-    public ResponseEntity<Order> showOrderById(@PathVariable (value = "id") Long id){
+    public ResponseEntity<OrderOutDTO> showOrderById(@PathVariable (value = "id") Long id){
         Order order = orderService.getOrderById(id);
         if (order != null) {
-            return ResponseEntity.ok(order);
+            return ResponseEntity.ok(orderMapper.toDto(order));
         } else {
             return ResponseEntity.notFound()
                     .build();
@@ -95,8 +97,8 @@ public class OrderController {
      */
     @GetMapping(value="/status")
     @Operation(summary = "Show all orders by status", description = "Returns detailed information about orders with the specified status")
-    public List<Order> showOrdersByStatus(@RequestParam(name = "status") OrderStatus status){
-        return orderService.getOrdersByStatus(status);
+    public List<OrderOutDTO> showOrdersByStatus(@RequestParam(name = "status") OrderStatus status){
+        return orderMapper.toDtoList(orderService.getOrdersByStatus(status));
     }
     /**
      * Endpoint to retrieve orders based on a specific request criteria encapsulated in a DTO.
@@ -106,8 +108,8 @@ public class OrderController {
      */
     @PostMapping(value = "/by-request")
     @Operation(summary = "Show all orders by request", description = "Returns detailed information about warrants for a given request")
-    public List<Order> showOrderByRequest(@RequestBody OrderShowDTO showDTO){
-        return orderService.getOrdersByStatusTypeCurrency(showDTO.getOrderStatus(), showDTO.getOperationType(), showDTO.getCurrencyCode());
+    public List<OrderOutDTO> showOrderByRequest(@RequestBody OrderShowDTO showDTO){
+        return orderMapper.toDtoList(orderService.getOrdersByStatusTypeCurrency(showDTO.getOrderStatus(), showDTO.getOperationType(), showDTO.getCurrencyCode()));
     }
     /**
      * Endpoint to retrieve orders belonging to the active user. It returns a list of the active user's orders.
@@ -116,8 +118,8 @@ public class OrderController {
      */
     @GetMapping(value = "/my")
     @Operation(summary = "Show orders of the active user", description = "Returns detailed information about the active user's orders")
-    public List<Order> showMyOrders(){
-        return orderService.getUsersOrders(activeUserService.getActiveUser().getId());
+    public List<OrderOutDTO> showMyOrders(){
+        return orderMapper.toDtoList(orderService.getUsersOrders(activeUserService.getActiveUser().getId()));
     }
 
 }

@@ -52,4 +52,6 @@ public interface RateRepository extends JpaRepository<Rate, Long> {
      * @return a list of {@link Rate} less than the specified value.
      */
     List<Rate> findRatesByValueLessThan(BigDecimal value);
+
+
 }

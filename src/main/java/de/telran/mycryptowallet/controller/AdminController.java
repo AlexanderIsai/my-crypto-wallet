@@ -1,9 +1,15 @@
 package de.telran.mycryptowallet.controller;
+import de.telran.mycryptowallet.dto.accountDTO.AccountOutDTO;
+import de.telran.mycryptowallet.dto.orderDTO.OrderOutDTO;
+import de.telran.mycryptowallet.dto.userDTO.UserOutDTO;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.TotalUserBalance;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
+import de.telran.mycryptowallet.mapper.accountMapper.AccountMapper;
+import de.telran.mycryptowallet.mapper.orderMapper.OrderMapper;
+import de.telran.mycryptowallet.mapper.userMapper.UserListMapper;
 import de.telran.mycryptowallet.service.interfaces.*;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -33,11 +39,14 @@ public class AdminController {
     private final AccountService accountService;
     private final AccountBusinessService accountBusinessService;
     private final OrderService orderService;
+    private final UserListMapper userListMapper;
+    private final AccountMapper accountMapper;
+    private final OrderMapper orderMapper;
 
     @GetMapping(value = "/show-all-users")
     @Operation(summary = "Show all users", description = "Returns detailed information about all users")
-    public List<User> showAllUsers() {
-        return userService.getAllUsers();
+    public List<UserOutDTO> showAllUsers() {
+        return userListMapper.toDtoList(userService.getAllUsers());
     }
 
     @PutMapping(value = "/block")
@@ -54,26 +63,26 @@ public class AdminController {
 
     @GetMapping(value = "/show-all-accounts")
     @Operation(summary = "Show all accounts", description = "Returns detailed information about all accounts")
-    public List<Account> showAllAccounts() {
-        return accountService.getAllAccounts();
+    public List<AccountOutDTO> showAllAccounts() {
+        return accountMapper.toDtoList(accountService.getAllAccounts());
     }
 
     @GetMapping(value = "/show-user-accounts")
     @Operation(summary = "show users accounts by ID", description = "Returns detailed accounts information for the user account specified by ID")
-    public List<Account> showAccountsByUser(@RequestParam(name = "userId") Long userId) {
-        return accountService.getAccountsByUser(userId);
+    public List<AccountOutDTO> showAccountsByUser(@RequestParam(name = "userId") Long userId) {
+        return accountMapper.toDtoList(accountService.getAccountsByUser(userId));
     }
 
     @GetMapping(value = "/show-orders")
     @Operation(summary = "Show all orders by user", description = "Returns detailed information about all orders by user")
-    public List<Order> showOrdersByUser(@RequestParam(name = "userId") Long userId) {
-        return orderService.getUsersOrders(userId);
+    public List<OrderOutDTO> showOrdersByUser(@RequestParam(name = "userId") Long userId) {
+        return orderMapper.toDtoList(orderService.getUsersOrders(userId));
     }
 
     @GetMapping(value = "/accounts-currency")
     @Operation(summary = "Show all accounts by currency", description = "Returns detailed information about all accounts for a given currency")
-    public List<Account> showAccountsByCurrency(@RequestParam(name = "code") String code) {
-        return accountService.getAccountsByCurrency(code);
+    public List<AccountOutDTO> showAccountsByCurrency(@RequestParam(name = "code") String code) {
+        return accountMapper.toDtoList(accountService.getAccountsByCurrency(code));
     }
 
     @GetMapping(value = "/show-total-balance")
@@ -91,8 +100,8 @@ public class AdminController {
 
     @GetMapping(value = "/users-with-status")
     @Operation(summary = "Show all users by status", description = "Returns detailed information about all users with the specified status")
-    public List<User> showUsersByStatus(@RequestParam(name = "status") UserStatus status) {
-        return userService.getUsersByStatus(status);
+    public List<UserOutDTO> showUsersByStatus(@RequestParam(name = "status") UserStatus status) {
+        return userListMapper.toDtoList(userService.getUsersByStatus(status));
     }
 
     @GetMapping(value = "/accounts-reset")
