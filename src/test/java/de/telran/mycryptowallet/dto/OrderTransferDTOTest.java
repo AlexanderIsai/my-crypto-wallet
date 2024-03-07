@@ -1,4 +1,5 @@
 package de.telran.mycryptowallet.dto;
+import de.telran.mycryptowallet.dto.orderDTO.OrderTransferDTO;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Order;
 import de.telran.mycryptowallet.entity.User;

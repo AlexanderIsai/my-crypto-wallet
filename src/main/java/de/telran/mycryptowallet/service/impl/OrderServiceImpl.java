@@ -1,9 +1,11 @@
 package de.telran.mycryptowallet.service.impl;
 
-import de.telran.mycryptowallet.dto.OrderTransferDTO;
+import de.telran.mycryptowallet.dto.orderDTO.OrderTransferDTO;
+import de.telran.mycryptowallet.dto.orderDTO.OrderAddDTO;
 import de.telran.mycryptowallet.entity.*;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.entity.entityEnum.OrderStatus;
+import de.telran.mycryptowallet.mapper.orderMapper.OrderMapper;
 import de.telran.mycryptowallet.repository.OrderRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
 import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
@@ -35,27 +37,25 @@ public class OrderServiceImpl implements OrderService {
     private final OrderValidator orderValidator;
     private final AccountValidator accountValidator;
     private final AccountBusinessService accountBusinessService;
+    private final OrderMapper orderMapper;
     private final static double BALANCE_SAFETY = 0.01;
     private final static int SCALE = 2;
 
     @Override
     @Transactional
-    public void addOrder(User user, String code, OperationType type, BigDecimal amount, BigDecimal rate) {
-        Order order = new Order();
+    public void addOrder(User user, OrderAddDTO orderAddDTO) {
+        Order order = orderMapper.toEntity(orderAddDTO);
 
         order.setUser(user);
 
-        Currency orderCurrency = currencyService.getCurrencyByCode(code);
+        Currency orderCurrency = currencyService.getCurrencyByCode(orderAddDTO.getCurrencyCode());
         order.setCurrency(orderCurrency);
 
-        order.setRateValue(rate);
-        accountValidator.isCorrectNumber(amount);
-        order.setAmount(amount);
+        accountValidator.isCorrectNumber(order.getAmount());
 
-        order.setType(type);
         order.setStatus(OrderStatus.ACTIVE);
 
-        accountBusinessService.reserveForOrder(user, code, type, amount, rate);
+        accountBusinessService.reserveForOrder(user, orderAddDTO.getCurrencyCode(), order.getType(), order.getAmount(), order.getRateValue());
         orderRepository.save(order);
     }
 

@@ -40,10 +40,10 @@ class CurrencyServiceImplTest {
 
     @Test
     void getAllCurrencies() {
-        when(currencyRepository.getAllCurrencies()).thenReturn(Arrays.asList(currencyUSD, currencyBTC));
+        when(currencyRepository.findAll()).thenReturn(Arrays.asList(currencyUSD, currencyBTC));
         List<Currency> currencies = currencyService.getAllCurrencies();
         assertThat(currencies).hasSize(2);
-        verify(currencyRepository, times(1)).getAllCurrencies();
+        verify(currencyRepository, times(1)).findAll();
     }
 
     @Test
@@ -56,10 +56,11 @@ class CurrencyServiceImplTest {
 
     @Test
     void getCurrencyByCode() {
-        when(currencyRepository.findCurrencyByCode("USDT")).thenReturn(currencyUSD);
-        Currency foundCurrency = currencyService.getCurrencyByCode("USDT");
-        assertThat(foundCurrency).isEqualTo(currencyUSD);
-        verify(currencyRepository, times(1)).findCurrencyByCode("USDT");
+        when(currencyRepository.findCurrencyByCode("BTC")).thenReturn(currencyBTC);
+        when(currencyService.isExistCurrencyByCode("BTC")).thenReturn(true);
+        Currency foundCurrency = currencyService.getCurrencyByCode("BTC");
+        assertThat(foundCurrency).isEqualTo(currencyBTC);
+        verify(currencyRepository, times(1)).findCurrencyByCode("BTC");
     }
 
     @Test

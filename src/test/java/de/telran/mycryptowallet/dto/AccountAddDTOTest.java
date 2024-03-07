@@ -1,4 +1,5 @@
 package de.telran.mycryptowallet.dto;
+import de.telran.mycryptowallet.dto.accountDTO.AccountAddDTO;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

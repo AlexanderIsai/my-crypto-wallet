@@ -1,6 +1,8 @@
 package de.telran.mycryptowallet.service.impl;
+import de.telran.mycryptowallet.dto.operationDTO.OperationAddDTO;
 import de.telran.mycryptowallet.entity.*;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
+import de.telran.mycryptowallet.mapper.operationMapper.OperationMapper;
 import de.telran.mycryptowallet.repository.OperationRepository;
 import de.telran.mycryptowallet.service.interfaces.*;
 import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
@@ -25,26 +27,23 @@ public class OperationServiceImpl implements OperationService {
     private final AccountValidator accountValidator;
     private final AccountBusinessService accountBusinessService;
     private final AccountManagerService accountManagerService;
+    private final OperationMapper operationMapper;
 
     @Override
     @Transactional
-    public Operation getExchangeOperation(User user, String code, BigDecimal amount, OperationType type) {
-        accountValidator.isCorrectNumber(amount);
-        Operation operation = new Operation();
+    public Operation getExchangeOperation(User user, OperationAddDTO operationAddDTO) {
+        Operation operation = operationMapper.toEntity(operationAddDTO);
+        accountValidator.isCorrectNumber(operation.getAmount());
         operation.setUser(user);
 
-        Currency operationCurrency = currencyService.getCurrencyByCode(code);
+        Currency operationCurrency = currencyService.getCurrencyByCode(operationAddDTO.getCurrencyCode());
         operation.setCurrency(operationCurrency);
 
         Account operationAccount = accountService.getAccountByUserIdAndCurrency(user.getId(), operationCurrency.getCode());
         accountValidator.isExistUserAccount(operationAccount);
         operation.setAccount(operationAccount);
 
-        operation.setAmount(amount);
-
-        operation.setType(type);
-
-        Rate operationRate = rateService.getFreshRate(code);
+        Rate operationRate = rateService.getFreshRate(operationAddDTO.getCurrencyCode());
         operation.setRateValue(operation.getType().equals(OperationType.BUY) ? operationRate.getSellRate() : operationRate.getBuyRate());
 
         return operation;
@@ -52,9 +51,9 @@ public class OperationServiceImpl implements OperationService {
     @Transactional
     @Override
     public void addOrderOperation(User orderOwner, User orderExecutor, Order order, BigDecimal amount) {
-        Operation buy = getExchangeOperation(orderOwner, order.getCurrency().getCode(), amount, OperationType.BUY);
+        Operation buy = getExchangeOperation(orderOwner, new OperationAddDTO(order.getCurrency().getCode(), amount, OperationType.BUY));
         buy.setRateValue(order.getRateValue());
-        Operation sell = getExchangeOperation(orderExecutor, order.getCurrency().getCode(), amount, OperationType.SELL);
+        Operation sell = getExchangeOperation(orderExecutor, new OperationAddDTO(order.getCurrency().getCode(), amount, OperationType.SELL));
         sell.setRateValue(order.getRateValue());
         operationRepository.save(buy);
         operationRepository.save(sell);

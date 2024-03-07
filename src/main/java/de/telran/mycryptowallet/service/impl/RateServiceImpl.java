@@ -7,6 +7,7 @@ import de.telran.mycryptowallet.service.interfaces.RateService;
 import de.telran.mycryptowallet.service.utils.RateGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ public class RateServiceImpl implements RateService {
     private final CurrencyService currencyService;
     private final RateRepository rateRepository;
     private final RateGenerator rateGenerator;
+    private final JdbcTemplate jdbcTemplate;
     private final static BigDecimal BASIC_RATE = BigDecimal.valueOf(1.00);
     private final static BigDecimal MARGIN = BigDecimal.valueOf(5.00);
     private final static int SCALE = 2;
@@ -84,5 +86,14 @@ public class RateServiceImpl implements RateService {
     @Override
     public Rate setOrderRate(BigDecimal rateValue) {
         return null;
+    }
+
+    @Override
+    @Scheduled(cron = "0 0 21 * * *")
+    public void deleteAllExceptLastTen() {
+        jdbcTemplate.update(
+                "DELETE FROM crypto_rates WHERE id NOT IN (SELECT id FROM (" +
+                        " SELECT id FROM crypto_rates ORDER BY id DESC LIMIT 10) AS subquery)"
+        );
     }
 }

@@ -44,4 +44,6 @@ public interface RateService {
      * @return The {@link Rate} instance created or updated with the specified value.
      */
     Rate setOrderRate(BigDecimal rateValue);
+
+    public void deleteAllExceptLastTen();
 }

@@ -1,6 +1,6 @@
 package de.telran.mycryptowallet.controller;
 
-import de.telran.mycryptowallet.dto.OperationAddDTO;
+import de.telran.mycryptowallet.dto.operationDTO.OperationAddDTO;
 import de.telran.mycryptowallet.entity.Operation;
 import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
 import de.telran.mycryptowallet.service.interfaces.OperationService;
@@ -38,7 +38,7 @@ public class OperationController {
     @PostMapping(value = "/add")
     @io.swagger.v3.oas.annotations.Operation(summary = "Add operation", description = "Creates a new transaction for the active user - deposit/withdrawal/buy/sell")
     public void addOperation(@RequestBody OperationAddDTO operationAddDTO)  {
-        Operation operation = operationService.getExchangeOperation(activeUserService.getActiveUser(), operationAddDTO.getCurrencyCode(), operationAddDTO.getAmount(), operationAddDTO.getType());
+        Operation operation = operationService.getExchangeOperation(activeUserService.getActiveUser(), operationAddDTO);
         operationService.cashFlow(operation);
     }
 

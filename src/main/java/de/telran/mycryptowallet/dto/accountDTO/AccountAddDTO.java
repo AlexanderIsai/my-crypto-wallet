@@ -1,4 +1,4 @@
-package de.telran.mycryptowallet.dto;
+package de.telran.mycryptowallet.dto.accountDTO;
 
 import lombok.Data;
 

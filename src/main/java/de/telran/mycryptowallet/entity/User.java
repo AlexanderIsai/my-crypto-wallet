@@ -36,7 +36,7 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(nullable = false, name = "name")
-    private String userName;
+    private String name;
 
     @Column(nullable = false, unique = true, name = "email")
     private String email;
@@ -70,7 +70,7 @@ public class User implements UserDetails {
      */
     @Override
     public String getUsername() {
-        return userName;
+        return name;
     }
 
     /**
@@ -109,5 +109,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 //TODO разобраться с этими четырьмя методами
 }

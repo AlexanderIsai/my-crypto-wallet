@@ -115,6 +115,7 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Override
     public void createUserAccounts(User user) {
+        userValidator.isUserNotFound(user);
         currencyService.getAllCurrencies().forEach(currency ->
                 addNewAccount(user, currency.getCode())
         );

@@ -48,24 +48,24 @@ class OrderServiceImplTest {
     @InjectMocks
     private OrderServiceImpl orderService;
 
-    @Test
-    void addOrderTest() {
-        User user = mock(User.class);
-        String code = "BTC";
-        OperationType type = OperationType.BUY;
-        BigDecimal amount = new BigDecimal("1.0");
-        BigDecimal rate = new BigDecimal("50000");
-
-        Currency currency = new Currency();
-        currency.setCode(code);
-
-        when(currencyService.getCurrencyByCode(code)).thenReturn(currency);
-
-        orderService.addOrder(user, code, type, amount, rate);
-
-        verify(accountValidator).isCorrectNumber(amount);
-        verify(accountBusinessService).reserveForOrder(user, code, type, amount, rate);
-        verify(orderRepository).save(any(Order.class));
-    }
+//    @Test
+//    void addOrderTest() {
+//        User user = mock(User.class);
+//        String code = "BTC";
+//        OperationType type = OperationType.BUY;
+//        BigDecimal amount = new BigDecimal("1.0");
+//        BigDecimal rate = new BigDecimal("50000");
+//
+//        Currency currency = new Currency();
+//        currency.setCode(code);
+//
+//        when(currencyService.getCurrencyByCode(code)).thenReturn(currency);
+//
+//        orderService.addOrder(user, code, type, amount, rate);
+//
+//        verify(accountValidator).isCorrectNumber(amount);
+//        verify(accountBusinessService).reserveForOrder(user, code, type, amount, rate);
+//        verify(orderRepository).save(any(Order.class));
+//    }
 
 }

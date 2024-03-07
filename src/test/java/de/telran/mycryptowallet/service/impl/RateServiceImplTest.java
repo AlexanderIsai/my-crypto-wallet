@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -65,13 +66,17 @@ class RateServiceImplTest {
     }
 
     @Test
-    void addRateTest() {
-        when(rateGenerator.getBitcoinPrice()).thenReturn(Map.of("BTC", Map.of("last", 50000)));
-        when(currencyService.getCurrencyByTitle(anyString())).thenReturn(currency);
+    void getRate() {
+        Map<String, Object> expectedBtcRate = Map.of("BTC", Map.of("last", "50000"));
+        Map<String, Object> expectedEthRate = Map.of("ETH", Map.of("last", "4000"));
 
-        rateService.addRate();
+        when(rateGenerator.getBitcoinPrice()).thenReturn(expectedBtcRate);
+        when(rateGenerator.geEthereumPrice()).thenReturn(expectedEthRate);
 
-        verify(rateRepository, times(1)).save(any(Rate.class));
+        List<Map<String, Object>> actualRates = rateService.getRate();
+
+        assertThat(actualRates).hasSize(2);
+        assertThat(actualRates).containsExactlyInAnyOrder(expectedBtcRate, expectedEthRate);
     }
 
     @Test

@@ -1,7 +1,9 @@
 package de.telran.mycryptowallet.service.impl;
+import de.telran.mycryptowallet.dto.userDTO.UserAddDTO;
 import de.telran.mycryptowallet.entity.User;
 import de.telran.mycryptowallet.entity.entityEnum.UserRole;
 import de.telran.mycryptowallet.entity.entityEnum.UserStatus;
+import de.telran.mycryptowallet.mapper.userMapper.UserMapper;
 import de.telran.mycryptowallet.repository.UserRepository;
 import de.telran.mycryptowallet.service.interfaces.UserService;
 import de.telran.mycryptowallet.service.utils.validators.UserValidator;
@@ -17,13 +19,12 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserValidator userValidator;
+    private final UserMapper userMapper;
     @Override
-    public void addNewUser(String userName, String email, String password) {
-        userValidator.isEmailPresent(getAllUsers(), email);
-        User user = new User();
-        user.setUserName(userName);
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
+    public void addNewUser(UserAddDTO userAddDTO) {
+        userValidator.isEmailPresent(getAllUsers(), userAddDTO.getEmail());
+        User user = userMapper.toEntity(userAddDTO);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(UserRole.ROLE_USER);
         user.setStatus(UserStatus.ONLINE);
         userRepository.save(user);
