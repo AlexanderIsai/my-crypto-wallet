@@ -1,5 +1,6 @@
 package de.telran.mycryptowallet.service.impl;
 
+import de.telran.mycryptowallet.dto.operationDTO.OperationTransferDTO;
 import de.telran.mycryptowallet.dto.orderDTO.OrderTransferDTO;
 import de.telran.mycryptowallet.dto.orderDTO.OrderAddDTO;
 import de.telran.mycryptowallet.entity.*;
@@ -12,12 +13,14 @@ import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
 import de.telran.mycryptowallet.service.utils.validators.OrderValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * description
@@ -38,7 +41,10 @@ public class OrderServiceImpl implements OrderService {
     private final AccountValidator accountValidator;
     private final AccountBusinessService accountBusinessService;
     private final OrderMapper orderMapper;
-    private final static double BALANCE_SAFETY = 0.01;
+    private final ManagerUserService managerUserService;
+    @Value("${app.transfer.fee}")
+    private BigDecimal fee;
+    private final static BigDecimal BALANCE_SAFETY = BigDecimal.valueOf(0.01);
     private final static int SCALE = 2;
 
     @Override
@@ -52,6 +58,9 @@ public class OrderServiceImpl implements OrderService {
         order.setCurrency(orderCurrency);
 
         accountValidator.isCorrectNumber(order.getAmount());
+
+        BigDecimal orderFee = order.getType().equals(OperationType.BUY) ? order.getAmount().multiply(fee).multiply(order.getRateValue()) : order.getAmount().multiply(fee);
+        order.setOrderFee(orderFee);
 
         order.setStatus(OrderStatus.ACTIVE);
 
@@ -81,16 +90,21 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private BigDecimal calculateTransferAmount(Order order, Account executorOrderAccount, Account executorBasicAccount) {
-        BigDecimal availableBalance = order.getType().equals(OperationType.BUY) ? executorOrderAccount.getBalance() : executorBasicAccount.getBalance().divide(order.getRateValue(), SCALE, RoundingMode.HALF_DOWN).subtract(BigDecimal.valueOf(BALANCE_SAFETY));
-        BigDecimal requiredAmount = order.getAmount();
+        BigDecimal orderRate = order.getRateValue();
+        BigDecimal orderFee = order.getAmount().multiply(fee);
+        BigDecimal availableBalanceOrderCurrency = executorOrderAccount.getBalance();
+        BigDecimal availableBalanceUSD = executorBasicAccount.getBalance().divide(orderRate, SCALE, RoundingMode.HALF_DOWN).subtract(BALANCE_SAFETY);
+        BigDecimal availableBalance = order.getType().equals(OperationType.BUY) ? availableBalanceOrderCurrency : availableBalanceUSD;
+        BigDecimal requiredAmount = order.getAmount().add(orderFee);
         if (availableBalance.compareTo(requiredAmount) >= 0) {
             order.setStatus(OrderStatus.DONE);
             return order.getAmount();
         } else {
             order.setStatus(OrderStatus.ACTIVE);
-            BigDecimal actualTransferAmount = availableBalance.compareTo(order.getAmount()) < 0 ? availableBalance : order.getAmount().subtract(availableBalance);
-            order.setAmount(order.getAmount().subtract(actualTransferAmount));
-            return actualTransferAmount;
+            //BigDecimal actualTransferAmount = availableBalance.compareTo(order.getAmount()) < 0 ? availableBalance : order.getAmount().subtract(availableBalance);
+            //BigDecimal actualTransferAmount = availableBalance.compareTo(order.getAmount()) < 0 ? availableBalance : order.getAmount().subtract(availableBalance);
+            order.setAmount(order.getAmount().subtract(availableBalance));
+            return availableBalance.subtract(orderFee);
         }
     }
 
@@ -105,8 +119,13 @@ public class OrderServiceImpl implements OrderService {
     public void executeOrder(Long orderId) {
         Order order = getOrderById(orderId);// нужный ордер
         orderValidator.isOrderActive(order);
+        User manager = managerUserService.getManager();
         User executorOrder = activeUserService.getActiveUser(); //юзер, который хочет его выполнить
         User ownerOrder = userService.getUserById(order.getUser().getId());//юзер, который владеет ордером
+
+        Account managerBasicAccount = accountService.getAccountByUserIdAndCurrency(manager.getId(), currencyService.getBasicCurrency());
+        Account managerOrderAccount = accountService.getAccountByUserIdAndCurrency(manager.getId(), order.getCurrency().getCode());
+
         Account ownerBasicAccount = accountService.getAccountByUserIdAndCurrency(ownerOrder.getId(), currencyService.getBasicCurrency()); //счет владельца ордера в базовой валюте (доллар), потому что он хочет купить крипту
         Account ownerOrderAccount = accountService.getAccountByUserIdAndCurrency(ownerOrder.getId(), order.getCurrency().getCode()); // счет владельца ордера в валюте ордера - туда должны упасть Битки
 
@@ -116,14 +135,23 @@ public class OrderServiceImpl implements OrderService {
 
         cancelOrder(order.getId());
         BigDecimal transferAmount = calculateTransferAmount(order, executerOrderAccount, executerBasicAccount);
+        BigDecimal orderFee = transferAmount.multiply(fee);
         OrderTransferDTO buyOrderTransferDTO = new OrderTransferDTO(order, ownerOrder, executorOrder, ownerBasicAccount, ownerOrderAccount, executerBasicAccount, executerOrderAccount, transferAmount);
         OrderTransferDTO sellOrderTransferDTO = new OrderTransferDTO(order, executorOrder, ownerOrder, executerBasicAccount, executerOrderAccount, ownerBasicAccount, ownerOrderAccount, transferAmount);
 
         if (operationType.equals(OperationType.BUY)){
             orderTransferOperation(buyOrderTransferDTO);
+            ownerBasicAccount.setBalance(ownerBasicAccount.getBalance().subtract(orderFee.multiply(order.getRateValue())));
+            managerBasicAccount.setBalance(managerBasicAccount.getBalance().add(orderFee.multiply(order.getRateValue())));
+            executerOrderAccount.setBalance(executerOrderAccount.getBalance().subtract(orderFee));
+            managerOrderAccount.setBalance(managerOrderAccount.getBalance().add(orderFee));
         }
         else {
             orderTransferOperation(sellOrderTransferDTO);
+            ownerOrderAccount.setBalance(ownerOrderAccount.getBalance().subtract(orderFee));
+            managerOrderAccount.setBalance(managerOrderAccount.getBalance().add(orderFee));
+            executerBasicAccount.setBalance(executerBasicAccount.getBalance().subtract(orderFee.multiply(order.getRateValue())));
+            managerBasicAccount.setBalance(managerBasicAccount.getBalance().add(orderFee.multiply(order.getRateValue())));
         }
             if(order.getStatus().equals(OrderStatus.ACTIVE)) {
                 accountBusinessService.returnPartOrder(ownerOrderAccount, order.getAmount());
@@ -162,11 +190,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public BigDecimal getOrderAmount(Order order) {
-        return order.getType().equals(OperationType.BUY) ? order.getAmount().multiply(order.getRateValue()) : order.getAmount();
+        return order.getType().equals(OperationType.BUY) ? (order.getAmount().add(order.getAmount().multiply(fee))).multiply(order.getRateValue()) : order.getAmount().add((order.getAmount().multiply(fee)));
     }
 
     @Override
     public void cancelAllOrders(){
-        orderRepository.findAll().forEach(order -> cancelOrder(order.getId()));
+
+        orderRepository.findAll().stream()
+                        .filter(Objects::nonNull)
+                                .filter(order -> order.getStatus().equals(OrderStatus.ACTIVE))
+                                        .forEach(order -> cancelOrder(order.getId()));
+
+        //orderRepository.findAll().forEach(order -> cancelOrder(order.getId()));
     }
 }

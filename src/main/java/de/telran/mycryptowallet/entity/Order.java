@@ -49,4 +49,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    @Column(name = "fee")
+    private BigDecimal orderFee;
+
 }

@@ -1,6 +1,7 @@
 package de.telran.mycryptowallet.service.interfaces;
 
 import de.telran.mycryptowallet.entity.Rate;
+import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -43,7 +44,7 @@ public interface RateService {
      * @param rateValue The value to set as the exchange rate.
      * @return The {@link Rate} instance created or updated with the specified value.
      */
-    Rate setOrderRate(BigDecimal rateValue);
+    BigDecimal setTransferRate(Rate rate, OperationType type);
 
     public void deleteAllExceptLastTen();
 }

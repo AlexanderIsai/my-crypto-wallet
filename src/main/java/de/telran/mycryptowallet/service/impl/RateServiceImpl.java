@@ -1,12 +1,14 @@
 package de.telran.mycryptowallet.service.impl;
 
 import de.telran.mycryptowallet.entity.Rate;
+import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.repository.RateRepository;
 import de.telran.mycryptowallet.service.interfaces.CurrencyService;
 import de.telran.mycryptowallet.service.interfaces.RateService;
 import de.telran.mycryptowallet.service.utils.RateGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,8 @@ public class RateServiceImpl implements RateService {
     private final JdbcTemplate jdbcTemplate;
     private final static BigDecimal BASIC_RATE = BigDecimal.valueOf(1.00);
     private final static BigDecimal MARGIN = BigDecimal.valueOf(5.00);
+    @Value("${app.exchange.fee}")
+    private BigDecimal fee;
     private final static int SCALE = 2;
     @Override
     public List<Map<String, Object>> getRate() {
@@ -60,10 +64,11 @@ public class RateServiceImpl implements RateService {
 
             Object priceValue = priceUsd.get(priceUsd.keySet().iterator().next());
             BigDecimal price = new BigDecimal(priceValue.toString());
+            BigDecimal profit = price.multiply(fee);
 
             rate.setValue(price);
-            rate.setSellRate(rate.getValue().add(rate.getValue().multiply(MARGIN).divide(BigDecimal.valueOf(100),SCALE, RoundingMode.HALF_DOWN )));
-            rate.setBuyRate(rate.getValue().subtract(rate.getValue().multiply(MARGIN).divide(BigDecimal.valueOf(100), SCALE, RoundingMode.HALF_DOWN)));
+            rate.setSellRate(rate.getValue().add(profit));
+            rate.setBuyRate(rate.getValue().subtract(profit));
             rateRepository.save(rate);
         });
     }
@@ -84,8 +89,14 @@ public class RateServiceImpl implements RateService {
     }
 
     @Override
-    public Rate setOrderRate(BigDecimal rateValue) {
-        return null;
+    public BigDecimal setTransferRate(Rate rate, OperationType type) {
+        BigDecimal rateValue = switch (type) {
+            case BUY -> rate.getSellRate();
+            case SELL -> rate.getBuyRate();
+            case SEND, RECEIVED -> rate.getValue();
+            default -> BigDecimal.ZERO;
+        };
+        return rateValue;
     }
 
     @Override
