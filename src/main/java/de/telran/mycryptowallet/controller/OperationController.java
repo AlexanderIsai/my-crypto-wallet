@@ -1,9 +1,11 @@
 package de.telran.mycryptowallet.controller;
 
 import de.telran.mycryptowallet.dto.operationDTO.OperationAddDTO;
+import de.telran.mycryptowallet.dto.operationDTO.OperationTransferDTO;
 import de.telran.mycryptowallet.entity.Operation;
 import de.telran.mycryptowallet.service.interfaces.ActiveUserService;
 import de.telran.mycryptowallet.service.interfaces.OperationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,9 +39,15 @@ public class OperationController {
      */
     @PostMapping(value = "/add")
     @io.swagger.v3.oas.annotations.Operation(summary = "Add operation", description = "Creates a new transaction for the active user - deposit/withdrawal/buy/sell")
-    public void addOperation(@RequestBody OperationAddDTO operationAddDTO)  {
+    public void addOperation(@RequestBody @Valid OperationAddDTO operationAddDTO)  {
         Operation operation = operationService.getExchangeOperation(activeUserService.getActiveUser(), operationAddDTO);
         operationService.cashFlow(operation);
     }
+    @PostMapping(value = "/transfer")
+    @io.swagger.v3.oas.annotations.Operation(summary = "Add transfer operation", description = "Creates a new transfer transaction for the active user")
+    public void addTransferOperation(@RequestBody @Valid OperationTransferDTO operationTransferDTO){
+        operationService.transferBetweenUsers(activeUserService.getActiveUser(), operationTransferDTO);
+    }
+
 
 }

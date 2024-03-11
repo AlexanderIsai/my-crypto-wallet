@@ -21,9 +21,9 @@ public class AccountManagerServiceImpl implements AccountManagerService {
 
     private final AccountRepository accountRepository;
     private final AccountService accountService;
-    private final UserService userService;
     private final CurrencyService currencyService;
     private final RateService rateService;
+    private final ManagerUserService managerUserService;
 
     @Override
     public void depositManager(String code, BigDecimal amount) {
@@ -40,7 +40,7 @@ public class AccountManagerServiceImpl implements AccountManagerService {
     }
 
     private Account getManagerAccountByCurrency(String code) {
-        User manager = userService.getUserByEmail("manager@ukr.net");
+        User manager = managerUserService.getManager();
         return accountRepository.findAccountByUserIdAndCurrencyCode(manager.getId(), code);
     }
     @Override

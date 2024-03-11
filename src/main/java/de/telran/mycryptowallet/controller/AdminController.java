@@ -107,7 +107,7 @@ public class AdminController {
     @GetMapping(value = "/accounts-reset")
     @Operation(summary = "Zero out all accounts", description = "Clears the balances of all accounts")
     public void resetAllAccounts() {
-        orderService.cancelAllOrders();
+        //orderService.cancelAllOrders();
         accountService.resetAllAccounts();
     }
 

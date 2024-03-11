@@ -1,5 +1,6 @@
 package de.telran.mycryptowallet.service.impl;
 import de.telran.mycryptowallet.dto.operationDTO.OperationAddDTO;
+import de.telran.mycryptowallet.dto.operationDTO.OperationTransferDTO;
 import de.telran.mycryptowallet.entity.*;
 import de.telran.mycryptowallet.entity.entityEnum.OperationType;
 import de.telran.mycryptowallet.mapper.operationMapper.OperationMapper;
@@ -8,6 +9,7 @@ import de.telran.mycryptowallet.service.interfaces.*;
 import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 
@@ -28,6 +30,9 @@ public class OperationServiceImpl implements OperationService {
     private final AccountBusinessService accountBusinessService;
     private final AccountManagerService accountManagerService;
     private final OperationMapper operationMapper;
+    private final ManagerUserService managerUserService;
+    @Value("${app.transfer.fee}")
+    private BigDecimal fee;
 
     @Override
     @Transactional
@@ -44,7 +49,7 @@ public class OperationServiceImpl implements OperationService {
         operation.setAccount(operationAccount);
 
         Rate operationRate = rateService.getFreshRate(operationAddDTO.getCurrencyCode());
-        operation.setRateValue(operation.getType().equals(OperationType.BUY) ? operationRate.getSellRate() : operationRate.getBuyRate());
+        operation.setRateValue(rateService.setTransferRate(operationRate, operation.getType()));
 
         return operation;
     }
@@ -100,8 +105,8 @@ public class OperationServiceImpl implements OperationService {
     //TODO clear comments
 
     @Override
-    public void transfer(Account sender, Account receiver, BigDecimal amount) {
-        sender.setBalance(sender.getBalance().subtract(amount));
+    public void transferByOrder(Account sender, Account receiver, BigDecimal amount) {
+        sender.setOrderBalance(sender.getOrderBalance().subtract(amount));
         accountService.updateAccount(sender.getId(), sender);
         receiver.setBalance(receiver.getBalance().add(amount));
         accountService.updateAccount(receiver.getId(), receiver);
@@ -110,5 +115,31 @@ public class OperationServiceImpl implements OperationService {
     @Override
     public Operation getOperationById(Long id) {
         return operationRepository.findById(id).orElseThrow();
+    }
+
+    @Override
+    @Transactional
+    public void transferBetweenUsers(User user, OperationTransferDTO operationTransferDTO) {
+        Account sender = accountService.getAccountByUserIdAndCurrency(user.getId(), operationTransferDTO.getCode());
+        Account receiver = accountService.getAccountByPublicAddress(operationTransferDTO.getAddress());
+        BigDecimal amount = operationTransferDTO.getAmount();
+        BigDecimal transferFee = amount.multiply(fee);
+        BigDecimal totalAmount = amount.add(transferFee);
+        accountValidator.isEnoughMoney(sender, totalAmount);
+        accountValidator.isCorrectReceiver(operationTransferDTO.getCode(), receiver);
+        sender.setBalance(sender.getBalance().subtract(totalAmount));
+        receiver.setBalance(receiver.getBalance().add(amount));
+        feeFromTransfer(operationTransferDTO.getCode(), transferFee);
+        accountService.updateAccount(sender.getId(), sender);
+        accountService.updateAccount(receiver.getId(), receiver);
+        operationRepository.save(getExchangeOperation(user, new OperationAddDTO(operationTransferDTO.getCode(), operationTransferDTO.getAmount(), OperationType.SEND)));
+        operationRepository.save(getExchangeOperation(receiver.getUser(), new OperationAddDTO(operationTransferDTO.getCode(), operationTransferDTO.getAmount(), OperationType.RECEIVED)));
+    }
+
+    private void feeFromTransfer(String code, BigDecimal amount){
+        User user = managerUserService.getManager();
+        Account account = accountService.getAccountByUserIdAndCurrency(user.getId(), code);
+        account.setBalance(account.getBalance().add(amount));
+        accountService.updateAccount(account.getId(), account);
     }
 }

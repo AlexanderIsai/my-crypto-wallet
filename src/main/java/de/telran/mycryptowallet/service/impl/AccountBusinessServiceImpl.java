@@ -9,6 +9,7 @@ import de.telran.mycryptowallet.service.interfaces.*;
 import de.telran.mycryptowallet.service.utils.validators.AccountValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -30,6 +31,9 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
     private final UserService userService;
     private final RateService rateService;
     private final AccountManagerService accountManagerService;
+    private final ManagerUserService managerUserService;
+    @Value("${app.transfer.fee}")
+    private BigDecimal fee;
     private final static int SCALE = 2;
 
     @Transactional
@@ -55,23 +59,27 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
     @Override
     public void reserveForOrder(User user, String code, OperationType type, BigDecimal amount, BigDecimal rate) {
         BigDecimal reserveAmount;
+        BigDecimal feeAmount;
         //accountValidator.isExistUserAccount(getAccountByUserIdAndCurrency(user.getId(), code).orElseThrow());
         switch (type) {
             case BUY:
                 Account accountBuy = accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), currencyService.getBasicCurrency());
-                reserveAmount = amount.multiply(rate);
+                feeAmount = amount.multiply(fee).multiply(rate);
+                reserveAmount = amount.multiply(rate).add(feeAmount);
                 accountValidator.isEnoughMoney(accountBuy, reserveAmount);
                 reserveMoney(accountBuy, reserveAmount);
                 break;
             case SELL:
                 Account accountSell = accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), code);
-                reserveAmount = amount;
+//                feeAmount = amount.multiply(fee);
+//                reserveAmount = amount.add(feeAmount);
                 accountValidator.isEnoughMoney(accountSell, amount);
-                reserveMoney(accountSell, reserveAmount);
+                reserveMoney(accountSell, amount);
                 break;
         }
     }
-    private void reserveMoney(Account account, BigDecimal amount){
+    @Override
+    public void reserveMoney(Account account, BigDecimal amount){
         account.setOrderBalance(account.getOrderBalance().add(amount));
         account.setBalance(account.getBalance().subtract(amount));
         accountService.updateAccount(account.getId(), account);
@@ -89,8 +97,10 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
     }
     @Override
     public void returnPartOrder(Account account, BigDecimal amount) {
-        account.setBalance(account.getBalance().subtract(amount));
-        account.setOrderBalance(amount);
+        BigDecimal orderFee = amount.multiply(fee);
+
+        account.setBalance(account.getBalance().subtract(amount).subtract(orderFee));
+        account.setOrderBalance(amount.add(orderFee));
         accountService.updateAccount(account.getId(), account);
     }
 
@@ -166,7 +176,7 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
     @Transactional
     @Override
     public TotalUserBalance showProfit() {
-        User manager = userService.getUserByEmail("manager@ukr.net");
+        User manager = managerUserService.getManager();
         TotalUserBalance profit = new TotalUserBalance();
         BigDecimal usd = getTotalUserBalance(manager.getId()).getUsd().subtract(getTotalBalance().getUsd());
         BigDecimal btc = getTotalUserBalance(manager.getId()).getBtc().subtract(getTotalBalance().getBtc());

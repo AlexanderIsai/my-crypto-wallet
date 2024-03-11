@@ -48,5 +48,7 @@ public enum OperationType {
     /**
      * A pending instruction for a buy or sell operation.
      */
-    ORDER
+    ORDER,
+    SEND,
+    RECEIVED
 }

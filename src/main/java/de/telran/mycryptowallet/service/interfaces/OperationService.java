@@ -1,5 +1,6 @@
 package de.telran.mycryptowallet.service.interfaces;
 import de.telran.mycryptowallet.dto.operationDTO.OperationAddDTO;
+import de.telran.mycryptowallet.dto.operationDTO.OperationTransferDTO;
 import de.telran.mycryptowallet.entity.Account;
 import de.telran.mycryptowallet.entity.Operation;
 import de.telran.mycryptowallet.entity.Order;
@@ -60,9 +61,11 @@ public interface OperationService {
      * @param to The account to which funds are being transferred.
      * @param amount The amount of funds to transfer.
      */
-    void transfer(Account from, Account to, BigDecimal amount);
+    void transferByOrder(Account from, Account to, BigDecimal amount);
     //TODO добавить админские методы (статистика и т.п.)
 
     Operation getOperationById(Long id);
+
+    void transferBetweenUsers(User user, OperationTransferDTO operationTransferDTO);
 
 }

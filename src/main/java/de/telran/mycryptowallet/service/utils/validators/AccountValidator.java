@@ -44,5 +44,11 @@ public class AccountValidator {
         }
     }
 
+    public void isCorrectReceiver(String code, Account account){
+        if(!code.equals(account.getCurrency().getCode())){
+            throw new IncorrectInputException("Incorrect the address! You can lose your money");
+        }
+    }
+
 
 }
