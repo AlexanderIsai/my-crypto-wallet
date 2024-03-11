@@ -105,8 +105,8 @@ public class OperationServiceImpl implements OperationService {
     //TODO clear comments
 
     @Override
-    public void transfer(Account sender, Account receiver, BigDecimal amount) {
-        sender.setBalance(sender.getBalance().subtract(amount));
+    public void transferByOrder(Account sender, Account receiver, BigDecimal amount) {
+        sender.setOrderBalance(sender.getOrderBalance().subtract(amount));
         accountService.updateAccount(sender.getId(), sender);
         receiver.setBalance(receiver.getBalance().add(amount));
         accountService.updateAccount(receiver.getId(), receiver);

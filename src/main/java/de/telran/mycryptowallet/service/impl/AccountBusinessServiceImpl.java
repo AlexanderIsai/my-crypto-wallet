@@ -71,14 +71,15 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
                 break;
             case SELL:
                 Account accountSell = accountRepository.findAccountByUserIdAndCurrencyCode(user.getId(), code);
-                feeAmount = amount.multiply(fee);
-                reserveAmount = amount.add(feeAmount);
-                accountValidator.isEnoughMoney(accountSell, reserveAmount);
-                reserveMoney(accountSell, reserveAmount);
+//                feeAmount = amount.multiply(fee);
+//                reserveAmount = amount.add(feeAmount);
+                accountValidator.isEnoughMoney(accountSell, amount);
+                reserveMoney(accountSell, amount);
                 break;
         }
     }
-    private void reserveMoney(Account account, BigDecimal amount){
+    @Override
+    public void reserveMoney(Account account, BigDecimal amount){
         account.setOrderBalance(account.getOrderBalance().add(amount));
         account.setBalance(account.getBalance().subtract(amount));
         accountService.updateAccount(account.getId(), account);
@@ -97,6 +98,7 @@ public class AccountBusinessServiceImpl implements AccountBusinessService {
     @Override
     public void returnPartOrder(Account account, BigDecimal amount) {
         BigDecimal orderFee = amount.multiply(fee);
+
         account.setBalance(account.getBalance().subtract(amount).subtract(orderFee));
         account.setOrderBalance(amount.add(orderFee));
         accountService.updateAccount(account.getId(), account);

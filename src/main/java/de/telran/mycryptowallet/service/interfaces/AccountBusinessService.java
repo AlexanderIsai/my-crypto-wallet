@@ -88,4 +88,6 @@ public interface AccountBusinessService {
      * @return the total profit
      */
     TotalUserBalance showProfit();
+
+    void reserveMoney(Account account, BigDecimal amount);
 }

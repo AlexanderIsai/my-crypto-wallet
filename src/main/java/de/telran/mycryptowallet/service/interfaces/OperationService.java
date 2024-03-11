@@ -61,7 +61,7 @@ public interface OperationService {
      * @param to The account to which funds are being transferred.
      * @param amount The amount of funds to transfer.
      */
-    void transfer(Account from, Account to, BigDecimal amount);
+    void transferByOrder(Account from, Account to, BigDecimal amount);
     //TODO добавить админские методы (статистика и т.п.)
 
     Operation getOperationById(Long id);
